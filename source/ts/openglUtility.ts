@@ -29,8 +29,7 @@ export function createVertexShader(glContext: WebGLRenderingContext, source: str
 		glContext.shaderSource(vertexShader, source)
 		glContext.compileShader(vertexShader)
 
-		const vertexShaderCompileStatus = glContext.getShaderParameter(vertexShader, glContext.COMPILE_STATUS)
-		if (!vertexShaderCompileStatus) {
+		if (!glContext.getShaderParameter(vertexShader, glContext.COMPILE_STATUS)) {
 			const info = glContext.getShaderInfoLog(vertexShader)
 			console.warn(info);
 		}
@@ -44,8 +43,7 @@ export function createFragmentShader(glContext: WebGLRenderingContext, source: s
 		glContext.shaderSource(fragmentShader, source)
 		glContext.compileShader(fragmentShader)
 
-		const fragmentShaderCompileStatus = glContext.getShaderParameter(fragmentShader, glContext.COMPILE_STATUS)
-		if (!fragmentShaderCompileStatus) {
+		if (!glContext.getShaderParameter(fragmentShader, glContext.COMPILE_STATUS)) {
 			const info = glContext.getShaderInfoLog(fragmentShader)
 			console.warn(info);
 		}
@@ -60,8 +58,7 @@ export function createProgram(glContext: WebGLRenderingContext, vertex: WebGLSha
 		glContext.attachShader(program, fragment)
 		glContext.linkProgram(program);
 
-		const linkStatus = glContext.getProgramParameter(program, glContext.LINK_STATUS);
-		if (!linkStatus) {
+		if (!glContext.getProgramParameter(program, glContext.LINK_STATUS)) {
 			const info: string | null = glContext.getProgramInfoLog(program)
 			console.warn(info)
 		}

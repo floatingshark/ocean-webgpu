@@ -5,15 +5,22 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "lint": "eslint ./source/**/*.ts",
+    "format": "prettier --write 'source/**/*.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/gl-matrix": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
     "css-loader": "^6.7.3",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
     "gl-matrix": "^3.4.3",
     "html-webpack-plugin": "^5.5.0",
+    "prettier": "^3.0.0",
     "style-loader": "^3.3.2",
     "ts-loader": "^9.4.2",
     "ts-shader-loader": "^2.0.2",
