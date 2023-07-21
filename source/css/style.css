@@ -1,0 +1,30 @@
+body 
+{
+    background-color: gray;
+    font-family: monospace;
+}
+
+.title
+{
+    text-align: center;
+    font-size: larger;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.canvas-container
+{
+    text-align: center;
+}
+
+#canvas
+{
+    width: 500px;
+    height: 500px;
+}
+
+.footer
+{
+    text-align: center;
+    padding-top: 20px;
+}
