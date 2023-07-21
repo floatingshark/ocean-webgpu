@@ -7,7 +7,7 @@
     "build": "webpack",
     "serve": "webpack serve",
     "lint": "eslint ./source/**/*.ts",
-    "format": "prettier --write 'source/**/*.ts"
+    "format": "prettier --write 'source/**/*.{html,css,js,ts,json,md}'"
   },
   "author": "",
   "license": "ISC",
