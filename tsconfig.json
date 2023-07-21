@@ -4,6 +4,11 @@
       "target": "ES2022",
       "module": "ESNext",
       "strict": true,
-      "lib": ["ES2022", "DOM",]
+      "lib": ["ES2022", "DOM",],
+      "moduleResolution": "node",
+      "baseUrl": "./",
+      "paths": {
+        "@ts/*": ["source/ts/*"]
+      }
     }
   }

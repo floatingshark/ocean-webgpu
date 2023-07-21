@@ -1,6 +1,6 @@
 body 
 {
-    background-color: gray;
+    background-color: ghostwhite;
     font-family: monospace;
 }
 
@@ -19,8 +19,8 @@ body
 
 #canvas
 {
-    width: 500px;
-    height: 500px;
+    width: 512px;
+    height: 512px;
 }
 
 .footer
