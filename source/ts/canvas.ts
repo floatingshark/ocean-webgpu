@@ -29,9 +29,6 @@ export class Canvas {
   protected canvas: HTMLCanvasElement | null = null;
   /** canvas element size */
   protected size: number[] = [512, 512];
-
-  /** mouse cursor position on canvas */
-  protected cursor: number[] = [0.0, 0.0];
   /** mouse down or not */
   protected cursorOn: boolean = false;
 
@@ -107,7 +104,7 @@ export class Canvas {
   }
 
   /**
-   * Setup event listener
+   * Setup event listener mousedown, mouseup, mousemove, wheel
    * @returns {boolean} setup is success or not
    */
   protected initializeEventListener(): boolean {
@@ -115,20 +112,37 @@ export class Canvas {
       return false;
     }
 
-    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
-      this.cursor[0] = e.offsetX;
-      this.cursor[1] = e.offsetY;
-      if (this.cursorOn) {
-        this.viewPosition[0] += e.movementX;
-      }
-    });
-
     this.canvas.addEventListener('mousedown', () => {
       this.cursorOn = true;
     });
 
     this.canvas.addEventListener('mouseup', () => {
       this.cursorOn = false;
+    });
+
+    // rotate when mouse downed
+    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+      if (this.cursorOn) {
+        // TODO: support every up vector
+        const ROTATE_MAGNITUDE: number = 0.005;
+        const rotateSizeX = -e.movementX * ROTATE_MAGNITUDE;
+        this.viewPosition = glm.vec3.rotateZ(glm.vec3.create(), this.viewPosition, glm.vec3.create(), rotateSizeX);
+        // TODO: support mouse Y move rotate
+
+        // temp Y movement(not orbital rotate)
+        const MOVEMENT_MAGNITUDE: number = 0.01;
+        this.viewPosition[2] += e.movementY * MOVEMENT_MAGNITUDE;
+      }
+    });
+
+    // zoom when mouse wheeled
+    this.canvas.addEventListener('wheel', (e: WheelEvent) => {
+      const ZOOM_MAGNITUDE: number = 0.01;
+      let zoomBasis: glm.vec3 = glm.vec3.subtract(glm.vec3.create(), this.viewLookAt, this.viewPosition);
+      zoomBasis = glm.vec3.normalize(zoomBasis, zoomBasis);
+      let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
+      zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
+      glm.vec3.add(this.viewPosition, this.viewPosition, zoomVec);
     });
 
     return true;
@@ -324,7 +338,6 @@ export class Canvas {
       const prevTime = Date.now();
       await animationFramePromise();
       const deltaTime = Date.now() - prevTime;
-      console.log(deltaTime);
       this.updateAnimation(deltaTime);
     }
   }
