@@ -1,6 +1,6 @@
 import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
-import * as openglUtility from '@ts/openglUtility';
+import * as shaderUtility from '@ts/shaderUtility';
 import * as glm from 'gl-matrix';
 
 /**
@@ -151,15 +151,15 @@ export class Canvas {
     this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
 
     // create shader
-    const vertexShader: WebGLShader | null = openglUtility.createVertexShader(this.glContext, VERTEX_SHADER_UNRIT);
-    const fragmentShader: WebGLShader | null = openglUtility.createFragmentShader(
+    const vertexShader: WebGLShader | null = shaderUtility.createVertexShader(this.glContext, VERTEX_SHADER_UNRIT);
+    const fragmentShader: WebGLShader | null = shaderUtility.createFragmentShader(
       this.glContext,
       FRAGMENT_SHADER_UNRIT
     );
 
     // create program
     if (vertexShader && fragmentShader) {
-      this.program = openglUtility.createProgram(this.glContext, vertexShader, fragmentShader);
+      this.program = shaderUtility.createProgram(this.glContext, vertexShader, fragmentShader);
       this.glContext.useProgram(this.program);
 
       if (this.program) {
@@ -187,7 +187,7 @@ export class Canvas {
     this.glContext.enableVertexAttribArray(this.vertexAttribLocation);
     this.glContext.vertexAttribPointer(
       this.vertexAttribLocation,
-      openglUtility.VERTEX_SIZE,
+      shaderUtility.VERTEX_SIZE,
       this.glContext.FLOAT,
       false,
       0,
@@ -198,7 +198,7 @@ export class Canvas {
     this.glContext.enableVertexAttribArray(this.colorAttribLocation);
     this.glContext.vertexAttribPointer(
       this.colorAttribLocation,
-      openglUtility.COLOR_SIZE,
+      shaderUtility.COLOR_SIZE,
       this.glContext.FLOAT,
       false,
       0,
@@ -218,15 +218,15 @@ export class Canvas {
     }
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, openglUtility.MESH_2D_VERTICE, this.glContext.STATIC_DRAW);
+    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, shaderUtility.MESH_2D_VERTICE, this.glContext.STATIC_DRAW);
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.colorBuffer);
-    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, openglUtility.MESH_2D_COLOR, this.glContext.STATIC_DRAW);
+    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, shaderUtility.MESH_2D_COLOR, this.glContext.STATIC_DRAW);
 
     this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.glContext.bufferData(
       this.glContext.ELEMENT_ARRAY_BUFFER,
-      new Int16Array(openglUtility.MESH_2D_INDEX),
+      new Int16Array(shaderUtility.MESH_2D_INDEX),
       this.glContext.STATIC_DRAW
     );
 
@@ -247,15 +247,15 @@ export class Canvas {
 
     this.uniformLocationModelMatrix = this.glContext.getUniformLocation(
       this.program,
-      openglUtility.UNIFORM_MODEL_MATRIX_NAME
+      shaderUtility.UNIFORM_MODEL_MATRIX_NAME
     );
     this.uniformLocationViewMatrix = this.glContext.getUniformLocation(
       this.program,
-      openglUtility.UNIFORM_VIEW_MATRIX_NAME
+      shaderUtility.UNIFORM_VIEW_MATRIX_NAME
     );
     this.uniformLocationProjectionMatrix = this.glContext.getUniformLocation(
       this.program,
-      openglUtility.UNIFORM_PROJECTION_MATRIX_NAME
+      shaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
     return true;
   }
@@ -293,7 +293,7 @@ export class Canvas {
     if (this.glContext === null) {
       return false;
     }
-    const INDEX_LENGTH: number = openglUtility.MESH_2D_INDEX.length;
+    const INDEX_LENGTH: number = shaderUtility.MESH_2D_INDEX.length;
     this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
     this.glContext.flush();
     return true;

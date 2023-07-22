@@ -4,5 +4,5 @@ import { Canvas } from '@ts/canvas';
 const canvas: Canvas = new Canvas('canvas');
 console.log(canvas);
 if (canvas && canvas.isValid()) {
-  canvas.beginAnimation();
+  await canvas.beginAnimation();
 }
