@@ -3,6 +3,9 @@
  */
 export const VERTEX_SIZE: number = 3;
 export const COLOR_SIZE: number = 4;
+export const UNIFORM_MODEL_MATRIX_NAME: string = 'u_ModelMatrix';
+export const UNIFORM_VIEW_MATRIX_NAME: string = 'u_ViewMatrix';
+export const UNIFORM_PROJECTION_MATRIX_NAME: string = 'u_ProjectionMatrix';
 
 // prettier-ignore
 export const MESH_2D_VERTICE: Float32Array = new Float32Array([
@@ -19,8 +22,11 @@ export const MESH_2D_COLOR: Float32Array = new Float32Array([
 	0.0, 0.0, 1.0, 1.0,
 	1.0, 1.0, 1.0, 1.0,
 ]);
-
-export const MESH_2D_INDEX: Int32Array = new Int32Array([0, 1, 2, 0, 2, 3]);
+// prettier-ignore
+export const MESH_2D_INDEX: Int32Array = new Int32Array([
+  0, 1, 2, 
+  0, 2, 3
+]);
 
 export function createVertexShader(glContext: WebGLRenderingContext, source: string): WebGLShader | null {
   const vertexShader: WebGLShader | null = glContext.createShader(glContext.VERTEX_SHADER);
