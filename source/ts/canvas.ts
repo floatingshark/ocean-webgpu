@@ -11,32 +11,25 @@ export class Canvas {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.glContext = this.canvas.getContext('webgl2');
 
-    if (!this.initializeShader()) {
-      console.log('[CONSTRUCTOR]SHADER INITIALIZE ERROR');
+    if (!this.initializeEventListener()) {
+      console.log('[CONSTRUCTOR]CANVAS INITIALIZE ERROR');
     }
-    if (!this.initializeAttribute()) {
-      console.log('[CONSTRUCTOR]ATTRIBUTE INITIALIZE ERROR');
-    }
-    if (!this.registerAttribute()) {
-      console.log('[CONSTRUCTOR]REGISTER ATTRIBUTE ERROR');
-    }
-    if (!this.intializeMatrix()) {
-      console.log('[CONSTRUCTOR]MATRIX INITIALIZE ERROR');
-    }
-    if (!this.initializeUniformLocation()) {
-      console.log('[CONSTRUCTOR]UNIFORM INITIALIZEERROR');
-    }
-    if (!this.registerUniform()) {
-      console.log('[CONSTRUCTOR]REGISTER UNIFORM ERROR');
-    }
-    if (!this.draw()) {
-      console.log('[CONSTRUCTOR]Draw ERROR');
-    }
+
+    this.initializeShader();
+    this.initializeAttribute();
+    this.registerAttribute();
+    this.initializeUniformLocation();
+    this.registerUniform();
+    this.draw();
   }
 
   protected canvas: HTMLCanvasElement | null = null;
   protected width: number = 512;
   protected height: number = 512;
+
+  protected animTime: number = 0;
+  protected cursor: number[] = [0.0, 0.0];
+  protected cursorOn: boolean = false;
 
   protected glContext: WebGLRenderingContext | null = null;
   protected program: WebGLProgram | null = null;
@@ -82,6 +75,30 @@ export class Canvas {
   }
   public setHeight(height: number) {
     this.height = height;
+  }
+
+  protected initializeEventListener(): boolean {
+    if (this.canvas === null) {
+      return false;
+    }
+    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+      this.cursor[0] = e.offsetX;
+      this.cursor[1] = e.offsetY;
+      if (this.cursorOn) {
+        this.viewPosition[0] += e.movementX;
+        console.log(this.viewPosition);
+      }
+    });
+
+    this.canvas.addEventListener('mousedown', () => {
+      this.cursorOn = true;
+    });
+
+    this.canvas.addEventListener('mouseup', () => {
+      this.cursorOn = false;
+    });
+
+    return true;
   }
 
   protected initializeShader(): boolean {
@@ -171,62 +188,6 @@ export class Canvas {
     return true;
   }
 
-  protected intializeMatrix(): boolean {
-    // Create model matrix
-    const translateMatrix: glm.mat4 = glm.mat4.translate(glm.mat4.create(), glm.mat4.create(), [
-      this.position[0],
-      this.position[1],
-      this.position[2],
-    ]);
-    const rotateMatrixX: glm.mat4 = glm.mat4.rotate(
-      glm.mat4.create(),
-      glm.mat4.create(),
-      this.rotation[0],
-      [1.0, 0.0, 0.0]
-    );
-    const rotateMatrixY: glm.mat4 = glm.mat4.rotate(
-      glm.mat4.create(),
-      glm.mat4.create(),
-      this.rotation[1],
-      [0.0, 1.0, 0.0]
-    );
-    const rotateMatrixZ: glm.mat4 = glm.mat4.rotate(
-      glm.mat4.create(),
-      glm.mat4.create(),
-      this.rotation[0],
-      [0.0, 0.0, 1.0]
-    );
-    const rotateMatrix: glm.mat4 = glm.mat4.multiply(
-      glm.mat4.create(),
-      glm.mat4.multiply(glm.mat4.create(), rotateMatrixZ, rotateMatrixY),
-      rotateMatrixX
-    );
-    const scaleMatrix: glm.mat4 = glm.mat4.scale(glm.mat4.create(), glm.mat4.create(), [
-      this.scale[0],
-      this.scale[1],
-      this.scale[2],
-    ]);
-    this.modelMatrix = glm.mat4.multiply(
-      glm.mat4.create(),
-      glm.mat4.multiply(glm.mat4.create(), translateMatrix, rotateMatrix),
-      scaleMatrix
-    );
-
-    // Create view matrix
-    this.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), this.viewPosition, this.viewLookAt, this.viewUp);
-    console.log(this.viewMatrix);
-    // Create prjection matrix
-    this.projectionMatrix = glm.mat4.perspective(
-      glm.mat4.create(),
-      this.projectionFovy,
-      this.projectionAspect,
-      this.projectionNear,
-      this.projectionFar
-    );
-
-    return true;
-  }
-
   protected initializeUniformLocation(): boolean {
     if (!this.glContext) {
       return false;
@@ -288,7 +249,23 @@ export class Canvas {
     return valid;
   }
 
-  public update() {
+  public async beginAnimation() {
+    function animationFramePromise(): Promise<number> {
+      return new Promise<number>((resolve) => {
+        globalThis.requestAnimationFrame(resolve);
+      });
+    }
+
+    const startTime = Date.now();
+    while (this.canvas) {
+      await animationFramePromise();
+      this.animTime = Date.now() - startTime;
+      this.updateAnimation();
+      console.log(this.animTime);
+    }
+  }
+
+  public updateAnimation() {
     if (this.canvas === null) {
       return;
     }
@@ -296,6 +273,69 @@ export class Canvas {
       return;
     }
 
-    this.initializeShader();
+    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+
+    this.calcurateMatrix();
+    this.registerAttribute();
+    this.registerUniform();
+    this.draw();
+  }
+
+  protected calcurateMatrix(): boolean {
+    // Create model matrix
+    const translateMatrix: glm.mat4 = glm.mat4.translate(glm.mat4.create(), glm.mat4.create(), [
+      this.position[0],
+      this.position[1],
+      this.position[2],
+    ]);
+
+    const rotateMatrixX: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[0],
+      [1.0, 0.0, 0.0]
+    );
+    const rotateMatrixY: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[1],
+      [0.0, 1.0, 0.0]
+    );
+    const rotateMatrixZ: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[0],
+      [0.0, 0.0, 1.0]
+    );
+    const rotateMatrix: glm.mat4 = glm.mat4.multiply(
+      glm.mat4.create(),
+      glm.mat4.multiply(glm.mat4.create(), rotateMatrixZ, rotateMatrixY),
+      rotateMatrixX
+    );
+    const scaleMatrix: glm.mat4 = glm.mat4.scale(glm.mat4.create(), glm.mat4.create(), [
+      this.scale[0],
+      this.scale[1],
+      this.scale[2],
+    ]);
+    this.modelMatrix = glm.mat4.multiply(
+      glm.mat4.create(),
+      glm.mat4.multiply(glm.mat4.create(), translateMatrix, rotateMatrix),
+      scaleMatrix
+    );
+
+    // Create view matrix
+    this.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), this.viewPosition, this.viewLookAt, this.viewUp);
+
+    // Create prjection matrix
+    this.projectionMatrix = glm.mat4.perspective(
+      glm.mat4.create(),
+      this.projectionFovy,
+      this.projectionAspect,
+      this.projectionNear,
+      this.projectionFar
+    );
+
+    return true;
   }
 }
