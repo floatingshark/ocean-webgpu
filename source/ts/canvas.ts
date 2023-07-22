@@ -1,15 +1,16 @@
 import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
 import * as openglUtility from '@ts/openglUtility';
-
+import * as glm from 'gl-matrix';
 /**
- *canvas element class for webgl
+ * Canvas element class for webgl
  */
 export class Canvas {
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.glContext = this.canvas.getContext('webgl2');
 
+    this.intializeMatrix();
     this.initializeShader();
   }
 
@@ -19,11 +20,28 @@ export class Canvas {
 
   protected glContext: WebGLRenderingContext | null = null;
   protected program: WebGLProgram | null = null;
+
   protected vertexBuffer: WebGLBuffer | null = null;
   protected vertexAttribLocation: number = 0;
   protected colorBuffer: WebGLBuffer | null = null;
   protected colorAttribLocation: number = 0;
   protected indexBuffer: WebGLBuffer | null = null;
+
+  protected position: glm.vec3 = [0, 0, 0];
+  protected rotation: glm.vec3 = [0, 0, 0];
+  protected scale: glm.vec3 = [0, 0, 0];
+  protected modelMatrix: glm.mat4 = glm.mat4.create();
+
+  protected viewPosition: glm.vec3 = [0, 0, 0];
+  protected viewLookAt: glm.vec3 = [0, 0, 0];
+  protected viewUp: glm.vec3 = [0, 0, 0];
+  protected viewMatrix: glm.mat4 = glm.mat4.create();
+
+  protected projectionFovy: number = 60.0;
+  protected projectionAspect: number = this.height / this.width;
+  protected projectionNear: number = 0;
+  protected projectionFar: number = 10000;
+  protected projectionMatrix: glm.mat4 = glm.mat4.create();
 
   public getCanvas(): HTMLCanvasElement | null {
     return this.canvas;
@@ -39,6 +57,62 @@ export class Canvas {
   }
   public setHeight(height: number) {
     this.height = height;
+  }
+
+  protected intializeMatrix(): boolean {
+    // Create model matrix
+    const translateMatrix: glm.mat4 = glm.mat4.translate(glm.mat4.create(), glm.mat4.create(), [
+      this.position[0],
+      this.position[1],
+      this.position[2],
+    ]);
+    const rotateMatrixX: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[0],
+      [1.0, 0.0, 0.0]
+    );
+    const rotateMatrixY: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[1],
+      [0.0, 1.0, 0.0]
+    );
+    const rotateMatrixZ: glm.mat4 = glm.mat4.rotate(
+      glm.mat4.create(),
+      glm.mat4.create(),
+      this.rotation[0],
+      [0.0, 0.0, 1.0]
+    );
+    const rotateMatrix: glm.mat4 = glm.mat4.multiply(
+      glm.mat4.create(),
+      glm.mat4.multiply(glm.mat4.create(), rotateMatrixZ, rotateMatrixY),
+      rotateMatrixX
+    );
+    const scaleMatrix: glm.mat4 = glm.mat4.scale(glm.mat4.create(), glm.mat4.create(), [
+      this.scale[0],
+      this.scale[1],
+      this.scale[2],
+    ]);
+    this.modelMatrix = glm.mat4.multiply(
+      glm.mat4.create(),
+      glm.mat4.multiply(glm.mat4.create(), translateMatrix, rotateMatrix),
+      scaleMatrix
+    );
+
+    // Create view matrix
+    this.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), this.viewPosition, this.viewLookAt, this.viewUp);
+
+    // Create prjection matrix
+    this.projectionMatrix = glm.mat4.perspective(
+      glm.mat4.create(),
+      this.projectionFovy,
+      this.projectionAspect,
+      this.projectionNear,
+      this.projectionFar
+    );
+
+    return true;
   }
 
   protected initializeShader(): boolean {
