@@ -22,6 +22,9 @@ export class Canvas {
     this.registerAttribute();
     this.initializeUniformLocation();
     this.registerUniform();
+
+    shaderUtility.generateSubdividedMesh2d(5, 5, this.vertexArray, this.colorArray, this.indexArray);
+
     this.draw();
   }
 
@@ -48,6 +51,13 @@ export class Canvas {
   protected vertexAttribLocation: number = 0;
   /** attribute location of vertix colors */
   protected colorAttribLocation: number = 0;
+
+  /** a vertex 2D array for attribute vertex buffer */
+  protected vertexArray: number[][] = shaderUtility.MESH_2D_VERTICE;
+  /** a color 2D array for attribute color buffer */
+  protected colorArray: number[][] = shaderUtility.MESH_2D_COLOR;
+  /** a index 2D array for index element buffer */
+  protected indexArray: number[][] = shaderUtility.MESH_2D_INDEX;
 
   /** uniform location of model matrix */
   protected uniformLocationModelMatrix: WebGLUniformLocation | null = null;
@@ -232,15 +242,23 @@ export class Canvas {
     }
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, shaderUtility.MESH_2D_VERTICE, this.glContext.STATIC_DRAW);
+    this.glContext.bufferData(
+      this.glContext.ARRAY_BUFFER,
+      new Float32Array(this.vertexArray.flat()),
+      this.glContext.STATIC_DRAW
+    );
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.colorBuffer);
-    this.glContext.bufferData(this.glContext.ARRAY_BUFFER, shaderUtility.MESH_2D_COLOR, this.glContext.STATIC_DRAW);
+    this.glContext.bufferData(
+      this.glContext.ARRAY_BUFFER,
+      new Float32Array(this.colorArray.flat()),
+      this.glContext.STATIC_DRAW
+    );
 
     this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.glContext.bufferData(
       this.glContext.ELEMENT_ARRAY_BUFFER,
-      new Int16Array(shaderUtility.MESH_2D_INDEX),
+      new Int16Array(this.indexArray.flat()),
       this.glContext.STATIC_DRAW
     );
 
@@ -307,8 +325,9 @@ export class Canvas {
     if (this.glContext === null) {
       return false;
     }
-    const INDEX_LENGTH: number = shaderUtility.MESH_2D_INDEX.length;
-    this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+    const INDEX_LENGTH: number = this.indexArray.flat().length;
+    //this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+    this.glContext.drawElements(this.glContext.LINE_STRIP, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
     this.glContext.flush();
     return true;
   }
