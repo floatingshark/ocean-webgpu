@@ -1,6 +1,16 @@
+import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
+import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
+import VERTEX_STOKES_WAVE from '@shader/sinusoidal_wave.vert';
+
 /**
  * OpenGL shader util export functions and parameters
  */
+/** a unlit vertex shader raw source code */
+export const VERTEX_SHADER_UNRIT_SOURCE = VERTEX_SHADER_UNRIT;
+/** a unlit fragment shader raw source code */
+export const FRAGMENT_SHADER_UNRIT_SOURCE = FRAGMENT_SHADER_UNRIT;
+/** a stokes wave shader raw source code */
+export const VERTEX_SHADER_SINUSOIDAL_WAVE_SOURCE = VERTEX_STOKES_WAVE;
 
 /** difinition of vertex dimension size */
 export const VERTEX_SIZE: number = 3;
@@ -12,6 +22,8 @@ export const UNIFORM_MODEL_MATRIX_NAME: string = 'u_ModelMatrix';
 export const UNIFORM_VIEW_MATRIX_NAME: string = 'u_ViewMatrix';
 /** uniform name of projection matrix in shader program */
 export const UNIFORM_PROJECTION_MATRIX_NAME: string = 'u_ProjectionMatrix';
+/** uniform name of time value in shader program */
+export const UNIFORM_TIME_NAME: string = 'u_Time';
 
 /**
  * compile vertex shader and get shader object
@@ -83,7 +95,7 @@ export function createProgram(
  * @param {number} division number of division
  * @param {number[]} vertice out vertex array for attribute buffer
  * @param {number[]} colors out color array for attribute buffer
- * @param {number[]} indice out index array for element buffer
+ * @param {number[]} indice [caution] out index array is a bit weird
  */
 export function generateSubdividedMesh2d(
   size: number,
@@ -99,15 +111,23 @@ export function generateSubdividedMesh2d(
   colors.length = division * division;
   indice.length = division * division;
 
-  for (let y = 0; y <= division; y++) {
-    for (let x = 0; x <= division; x++) {
-      const index: number = x + (division + 1) * y;
-      const origin: number = -division / 2.0;
-      vertice[index] = [((origin + x) / division) * size, ((origin + y) / division) * size, 0.0];
+  const lattice: number = division + 1;
+  for (let y = 0; y < lattice; y++) {
+    for (let x = 0; x < lattice; x++) {
+      const index: number = x + lattice * y;
+      const origin: number = -lattice / 2.0;
+      vertice[index] = [((origin + x) / lattice) * size, ((origin + y) / lattice) * size, 0.0];
       colors[index] = [1.0, 1.0, 1.0, 1.0];
-      if (x < division && y < division) {
-        indice[2 * index] = [index, index + (division + 1), index + (division + 1) + 1];
-        indice[2 * index + 1] = [index + 1, index, index + (division + 1) + 1];
+      if (x < lattice - 1 && y < lattice - 1) {
+        if (y % 2 == 0) {
+          indice[2 * index] = [index, index + lattice, index + lattice + 1];
+          indice[2 * index + 1] = [index + 1, index, index + lattice + 1];
+        } else {
+          const rowLastIndex = y * lattice + lattice - 1;
+          const evenIndex = rowLastIndex - x;
+          indice[2 * index] = [evenIndex - 1, evenIndex + lattice, evenIndex];
+          indice[2 * index + 1] = [evenIndex + lattice, evenIndex + lattice - 1, evenIndex - 1];
+        }
       }
     }
   }

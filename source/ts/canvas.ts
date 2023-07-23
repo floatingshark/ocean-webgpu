@@ -1,5 +1,3 @@
-import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
-import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
 import * as shaderUtility from '@ts/shaderUtility';
 import * as glm from 'gl-matrix';
 
@@ -17,13 +15,14 @@ export class Canvas {
 
     this.initializeEventListener();
 
+    shaderUtility.generateSubdividedMesh2d(8, 8, this.vertexArray, this.colorArray, this.indexArray);
+    this.vertexShaderSource = shaderUtility.VERTEX_SHADER_SINUSOIDAL_WAVE_SOURCE;
+
     this.initializeShader();
     this.initializeAttribute();
     this.registerAttribute();
     this.initializeUniformLocation();
     this.registerUniform();
-
-    shaderUtility.generateSubdividedMesh2d(5, 5, this.vertexArray, this.colorArray, this.indexArray);
 
     this.draw();
   }
@@ -32,11 +31,17 @@ export class Canvas {
   protected canvas: HTMLCanvasElement | null = null;
   /** canvas element size */
   protected size: number[] = [512, 512];
-  /** mouse down or not */
+  /** is mouse down or not */
   protected cursorOn: boolean = false;
+  /** current animation time */
+  protected time: number = 0.0;
 
   /** webgl2.0 context this canvas */
   protected glContext: WebGLRenderingContext | null = null;
+  /** a using current vertex shader source code */
+  protected vertexShaderSource: string = shaderUtility.VERTEX_SHADER_UNRIT_SOURCE;
+  /** a using current fragment shader source code */
+  protected fragmentShaderSource: string = shaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
   /** current shader program */
   protected program: WebGLProgram | null = null;
 
@@ -65,6 +70,8 @@ export class Canvas {
   protected uniformLocationViewMatrix: WebGLUniformLocation | null = null;
   /** uniform location of projection matrix */
   protected uniformLocationProjectionMatrix: WebGLUniformLocation | null = null;
+  /** uniform location of time value */
+  protected uniformLocationTime: WebGLUniformLocation | null = null;
 
   /** model position */
   protected position: glm.vec3 = [0.0, 0.0, -1.0];
@@ -76,7 +83,7 @@ export class Canvas {
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
   /** view position a.k.a camera position */
-  protected viewPosition: glm.vec3 = [2.0, 2.0, 5.0];
+  protected viewPosition: glm.vec3 = [0.1, 0.2, 3.0];
   /** the position camera look at */
   protected viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
   /** basis upvector , basically [0, 1, 0] or [0, 0, 0] and it depends on industry */
@@ -175,10 +182,10 @@ export class Canvas {
     this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
 
     // create shader
-    const vertexShader: WebGLShader | null = shaderUtility.createVertexShader(this.glContext, VERTEX_SHADER_UNRIT);
+    const vertexShader: WebGLShader | null = shaderUtility.createVertexShader(this.glContext, this.vertexShaderSource);
     const fragmentShader: WebGLShader | null = shaderUtility.createFragmentShader(
       this.glContext,
-      FRAGMENT_SHADER_UNRIT
+      this.fragmentShaderSource
     );
 
     // create program
@@ -289,6 +296,7 @@ export class Canvas {
       this.program,
       shaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
+    this.uniformLocationTime = this.glContext.getUniformLocation(this.program, shaderUtility.UNIFORM_TIME_NAME);
     return true;
   }
 
@@ -312,6 +320,9 @@ export class Canvas {
     }
     if (this.uniformLocationProjectionMatrix !== null) {
       this.glContext.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
+    }
+    if (this.uniformLocationTime !== null) {
+      this.glContext.uniform1f(this.uniformLocationTime, this.time);
     }
 
     return true;
@@ -379,6 +390,7 @@ export class Canvas {
     this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
     this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
 
+    this.time += deltaTime;
     this.calculateMvpMatrices();
 
     this.registerAttribute();
