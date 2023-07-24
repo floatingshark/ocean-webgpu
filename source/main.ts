@@ -2,6 +2,6 @@ import '@css/style.css';
 import { Canvas } from '@ts/canvas';
 
 const canvas: Canvas = new Canvas('canvas');
-if (canvas && canvas.isValid()) {
-  await canvas.beginAnimation();
+if (canvas) {
+  await canvas.beginUpdate();
 }
