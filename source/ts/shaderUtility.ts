@@ -24,6 +24,16 @@ export const UNIFORM_VIEW_MATRIX_NAME: string = 'u_ViewMatrix';
 export const UNIFORM_PROJECTION_MATRIX_NAME: string = 'u_ProjectionMatrix';
 /** uniform name of time value in shader program */
 export const UNIFORM_TIME_NAME: string = 'u_Time';
+/** uniform name of wave number in shader program */
+export const UNIFORM_WAVE_NUMBER_NAME: string = 'u_WaveNumber';
+/** uniform name of wave amplitude in shader program */
+export const UNIFORM_WAVE_AMPLITUDE_NAME: string = 'u_Amplitude';
+/** uniform name of wave speed in shader program */
+export const UNIFORM_WAVE_SPEED_NAME: string = 'u_Speed';
+/** uniform name of wave direction in shader program */
+export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
+/** uniform name of wave frequency in shader program */
+export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
 
 /**
  * compile vertex shader and get shader object

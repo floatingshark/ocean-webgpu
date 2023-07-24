@@ -11,7 +11,7 @@ export class Shader {
   constructor(canvas: HTMLCanvasElement) {
     this.glContext = canvas.getContext('webgl2');
 
-    ShaderUtility.generateSubdividedMesh2d(8, 8, this.vertexArray, this.colorArray, this.indexArray);
+    ShaderUtility.generateSubdividedMesh2d(16, 32, this.vertexArray, this.colorArray, this.indexArray);
     this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_SINUSOIDAL_WAVE_SOURCE;
 
     this.initializeShader();
@@ -31,9 +31,6 @@ export class Shader {
   protected fragmentShaderSource: string = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
   /** current shader program */
   protected program: WebGLProgram | null = null;
-
-  /** current animation time */
-  protected time: number = 0.0;
 
   /** attribute buffer of vertices */
   protected vertexBuffer: WebGLBuffer | null = null;
@@ -62,9 +59,19 @@ export class Shader {
   protected uniformLocationProjectionMatrix: WebGLUniformLocation | null = null;
   /** uniform location of time value */
   protected uniformLocationTime: WebGLUniformLocation | null = null;
+  /** uniform location of wave number */
+  protected uniformLocationWaveNumber: WebGLUniformLocation | null = null;
+  /** uniform location of wave amplitude */
+  protected uniformLocationWaveAmplitude: WebGLUniformLocation | null = null;
+  /** uniform location of wave speed */
+  protected unifromLocationWaveSpeed: WebGLUniformLocation | null = null;
+  /** uniform location of wave direction */
+  protected uniformLocationWaveDirection: WebGLUniformLocation | null = null;
+  /** uniform location of wave frequency */
+  protected uniformLocationWaveFrequency: WebGLUniformLocation | null = null;
 
   /** model position */
-  protected position: glm.vec3 = [0.0, 0.0, -1.0];
+  protected position: glm.vec3 = [0.0, 0.0, 0.0];
   /** model rotation */
   protected rotation: glm.vec3 = [0.0, 0.0, 0.0];
   /** model scale */
@@ -73,7 +80,7 @@ export class Shader {
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
   /** view position a.k.a camera position */
-  public viewPosition: glm.vec3 = [0.1, 0.2, 3.0];
+  public viewPosition: glm.vec3 = [1, 2, 5.0];
   /** the position camera look at */
   public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
   /** basis upvector , basically [0, 1, 0] or [0, 0, 0] and it depends on industry */
@@ -92,12 +99,30 @@ export class Shader {
   /** 4x4 projection matrix */
   protected projectionMatrix: glm.mat4 = glm.mat4.create();
 
+  /** current animation time */
+  protected time: number = 0.0;
+  /** wave number >= 1 and integer */
+  protected waveNumber: number = 4;
+  /** each wave max height */
+  protected amplitude: number[] = [0.5, 0.4, 0.2, 0.3];
+  /** each wave speed - being different is better */
+  protected speed: number[] = [0.0015, 0.0013, 0.001, 0.0008];
+  /** each wave direction being different is better */
+  protected direction: number[][] = [
+    [0.5, 0.7],
+    [-0.6, -0.2],
+    [0.7, -0.4],
+    [-0.2, 0.4],
+  ];
+  /** each wave frequency */
+  protected frequency: number[] = [1.0, 1.7, 1.5, 1.3];
+
   /**
    * Setup shader program
    * @returns {boolean} setup is success or not
    */
   protected initializeShader(): boolean {
-    if (this.glContext === null) {
+    if (!this.glContext) {
       return false;
     }
 
@@ -130,7 +155,7 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeAttribute(): boolean {
-    if (this.glContext === null) {
+    if (!this.glContext) {
       return false;
     }
 
@@ -168,7 +193,7 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected registerAttribute(): boolean {
-    if (this.glContext === null) {
+    if (!this.glContext) {
       return false;
     }
 
@@ -201,10 +226,7 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeUniformLocation(): boolean {
-    if (!this.glContext) {
-      return false;
-    }
-    if (!this.program) {
+    if (!this.glContext || !this.program) {
       return false;
     }
 
@@ -221,6 +243,26 @@ export class Shader {
       ShaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
     this.uniformLocationTime = this.glContext.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
+    this.uniformLocationWaveNumber = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_NUMBER_NAME
+    );
+    this.uniformLocationWaveAmplitude = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
+    );
+    this.unifromLocationWaveSpeed = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_SPEED_NAME
+    );
+    this.uniformLocationWaveDirection = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_DIRECTION_NAME
+    );
+    this.uniformLocationWaveFrequency = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_FREQUENCY_NAME
+    );
     return true;
   }
 
@@ -229,24 +271,36 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected registerUniform(): boolean {
-    if (!this.glContext) {
-      return false;
-    }
-    if (!this.program) {
+    if (!this.glContext || !this.program) {
       return false;
     }
 
-    if (this.uniformLocationModelMatrix !== null) {
+    if (this.uniformLocationModelMatrix) {
       this.glContext.uniformMatrix4fv(this.uniformLocationModelMatrix, false, this.modelMatrix);
     }
-    if (this.uniformLocationViewMatrix !== null) {
+    if (this.uniformLocationViewMatrix) {
       this.glContext.uniformMatrix4fv(this.uniformLocationViewMatrix, false, this.viewMatrix);
     }
-    if (this.uniformLocationProjectionMatrix !== null) {
+    if (this.uniformLocationProjectionMatrix) {
       this.glContext.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
     }
-    if (this.uniformLocationTime !== null) {
+    if (this.uniformLocationTime) {
       this.glContext.uniform1f(this.uniformLocationTime, this.time);
+    }
+    if (this.uniformLocationWaveNumber) {
+      this.glContext.uniform1i(this.uniformLocationWaveNumber, this.waveNumber);
+    }
+    if (this.uniformLocationWaveAmplitude) {
+      this.glContext.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
+    }
+    if (this.unifromLocationWaveSpeed) {
+      this.glContext.uniform1fv(this.unifromLocationWaveSpeed, this.speed);
+    }
+    if (this.uniformLocationWaveDirection) {
+      this.glContext.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
+    }
+    if (this.uniformLocationWaveFrequency) {
+      this.glContext.uniform1fv(this.uniformLocationWaveFrequency, this.frequency);
     }
 
     return true;
@@ -257,9 +311,10 @@ export class Shader {
    * @returns {boolean} success or not
    */
   protected draw(): boolean {
-    if (this.glContext === null) {
+    if (!this.glContext) {
       return false;
     }
+
     const INDEX_LENGTH: number = this.indexArray.flat().length;
     //this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
     this.glContext.drawElements(this.glContext.LINE_STRIP, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
@@ -272,10 +327,7 @@ export class Shader {
    * @param {number} deltaTime duration time between current and prev frame
    */
   public update(deltaTime: number) {
-    if (this.glContext === null) {
-      return;
-    }
-    if (deltaTime <= 0.0) {
+    if (!this.glContext || deltaTime <= 0.0) {
       return;
     }
 
@@ -284,6 +336,7 @@ export class Shader {
 
     this.time += deltaTime;
     this.calculateMvpMatrices();
+    this.calculateWaveContext();
 
     this.registerAttribute();
     this.registerUniform();
@@ -348,6 +401,17 @@ export class Shader {
       this.projectionFar
     );
 
+    return true;
+  }
+
+  /** Calc wave contexts - amplitude, speed, direction, frequency
+   * @returns {boolean} calced successfully or not
+   */
+  protected calculateWaveContext(): boolean {
+    this.amplitude.length = this.waveNumber;
+    this.speed.length = this.waveNumber;
+    this.direction.length = this.waveNumber;
+    this.frequency.length = this.waveNumber;
     return true;
   }
 }
