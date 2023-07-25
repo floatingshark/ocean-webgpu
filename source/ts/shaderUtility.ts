@@ -28,6 +28,8 @@ export const UNIFORM_TIME_NAME: string = 'u_Time';
 export const UNIFORM_WAVE_NUMBER_NAME: string = 'u_WaveNumber';
 /** uniform name of wave amplitude in shader program */
 export const UNIFORM_WAVE_AMPLITUDE_NAME: string = 'u_Amplitude';
+/** uniform name of wave length in shader program */
+export const UNIFORM_WAVE_LENGTH_NAME: string = 'u_Length';
 /** uniform name of wave speed in shader program */
 export const UNIFORM_WAVE_SPEED_NAME: string = 'u_Speed';
 /** uniform name of wave direction in shader program */

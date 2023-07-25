@@ -61,14 +61,14 @@ export class Shader {
   protected uniformLocationTime: WebGLUniformLocation | null = null;
   /** uniform location of wave number */
   protected uniformLocationWaveNumber: WebGLUniformLocation | null = null;
-  /** uniform location of wave amplitude */
+  /** uniform location of wave amplitude[A] */
   protected uniformLocationWaveAmplitude: WebGLUniformLocation | null = null;
-  /** uniform location of wave speed */
+  /** uniform location of wave length[λ] */
+  protected uniformLocationWaveLength: WebGLUniformLocation | null = null;
+  /** uniform location of wave speed[S] */
   protected unifromLocationWaveSpeed: WebGLUniformLocation | null = null;
-  /** uniform location of wave direction */
+  /** uniform location of wave direction[D] */
   protected uniformLocationWaveDirection: WebGLUniformLocation | null = null;
-  /** uniform location of wave frequency */
-  protected uniformLocationWaveFrequency: WebGLUniformLocation | null = null;
 
   /** model position */
   protected position: glm.vec3 = [0.0, 0.0, 0.0];
@@ -105,6 +105,8 @@ export class Shader {
   protected waveNumber: number = 4;
   /** each wave max height */
   protected amplitude: number[] = [0.5, 0.4, 0.2, 0.3];
+  /** each wave length */
+  protected length: number[] = [1.0, 1.2, 1.0, 0.8];
   /** each wave speed - being different is better */
   protected speed: number[] = [0.0015, 0.0013, 0.001, 0.0008];
   /** each wave direction being different is better */
@@ -114,8 +116,6 @@ export class Shader {
     [0.7, -0.4],
     [-0.2, 0.4],
   ];
-  /** each wave frequency */
-  protected frequency: number[] = [1.0, 1.7, 1.5, 1.3];
 
   /**
    * Setup shader program
@@ -251,6 +251,10 @@ export class Shader {
       this.program,
       ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
     );
+	this.uniformLocationWaveLength = this.glContext.getUniformLocation(
+		this.program,
+		ShaderUtility.UNIFORM_WAVE_LENGTH_NAME
+	  );
     this.unifromLocationWaveSpeed = this.glContext.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_WAVE_SPEED_NAME
@@ -258,10 +262,6 @@ export class Shader {
     this.uniformLocationWaveDirection = this.glContext.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_WAVE_DIRECTION_NAME
-    );
-    this.uniformLocationWaveFrequency = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_FREQUENCY_NAME
     );
     return true;
   }
@@ -293,14 +293,14 @@ export class Shader {
     if (this.uniformLocationWaveAmplitude) {
       this.glContext.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
     }
+	if (this.uniformLocationWaveLength) {
+		this.glContext.uniform1fv(this.uniformLocationWaveLength, this.length);
+	  }
     if (this.unifromLocationWaveSpeed) {
       this.glContext.uniform1fv(this.unifromLocationWaveSpeed, this.speed);
     }
     if (this.uniformLocationWaveDirection) {
       this.glContext.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
-    }
-    if (this.uniformLocationWaveFrequency) {
-      this.glContext.uniform1fv(this.uniformLocationWaveFrequency, this.frequency);
     }
 
     return true;
@@ -409,9 +409,9 @@ export class Shader {
    */
   protected calculateWaveContext(): boolean {
     this.amplitude.length = this.waveNumber;
+	this.length.length = this.waveNumber;
     this.speed.length = this.waveNumber;
     this.direction.length = this.waveNumber;
-    this.frequency.length = this.waveNumber;
     return true;
   }
 }
