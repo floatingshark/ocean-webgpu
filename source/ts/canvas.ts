@@ -101,7 +101,7 @@ export class Canvas {
   /**
    * Start canvas update loop
    */
-  public async beginUpdate() {
+  public async beginUpdate(): Promise<void> {
     function animationFramePromise(): Promise<number> {
       return new Promise<number>((resolve) => {
         globalThis.requestAnimationFrame(resolve);
@@ -120,7 +120,7 @@ export class Canvas {
    * Update loop function for canvas class
    * @param {number} deltaTime duration time between current and prev frame
    */
-  protected update(deltaTime: number) {
+  protected update(deltaTime: number): void {
     if (!this.canvas || !this.shader) {
       return;
     }

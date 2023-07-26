@@ -31,7 +31,7 @@ export const UNIFORM_WAVE_AMPLITUDE_NAME: string = 'u_Amplitude';
 /** uniform name of wave length in shader program */
 export const UNIFORM_WAVE_LENGTH_NAME: string = 'u_Length';
 /** uniform name of wave speed in shader program */
-export const UNIFORM_WAVE_SPEED_NAME: string = 'u_Speed';
+export const UNIFORM_WAVE_CYCLE_NAME: string = 'u_Cycle';
 /** uniform name of wave direction in shader program */
 export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
 /** uniform name of wave frequency in shader program */

@@ -8,20 +8,23 @@ uniform mat4 u_ViewMatrix;
 uniform mat4 u_ProjectionMatrix;
 uniform float u_Time;
 uniform int u_WaveNumber;
-uniform float[8] u_Amplitude;
-uniform float[8] u_Length;
-uniform float[8] u_Speed;
-uniform vec2[8] u_Direction;
+// v(speed) = λν(wave length * frequency) = λ/T
+uniform float[8] u_Amplitude; // A
+uniform float[8] u_Length; // λ
+uniform float[8] u_Cycle; // T
+uniform vec2[8] u_Direction; // D
 out vec4 out_Color;
 
-//const float PI  = 3.141592653589793;
-//const float INVPI = 1.0 / PI;
+const float PI  = 3.1415926;
+const float INVPI = 1.0 / PI;
 
-float SinusoidalWave(vec2 pos, float amp, float len, float speed, vec2 dir, float time)
+float SinusoidalWave(vec2 pos, float A, float rambda, float T, vec2 dir, float t)
 {
-	float freq = 2.0 / len;
-	float phase = dot(dir, pos) * freq + time * speed * freq;
-	return amp * sin(phase);
+	float k = 2.0 * PI / rambda;
+	float x = dot(dir, pos);
+	float omega = 2.0 * PI / T;
+	float phase = k * x + omega * t;
+	return A * sin(phase);
 }
 
 void main() {
@@ -30,7 +33,7 @@ void main() {
 	// TODO: FFT
 	for(int i = 0; i < u_WaveNumber; i++)
 	{
-		posZ += SinusoidalWave(posXY, u_Amplitude[i], u_Length[i], u_Speed[i], u_Direction[i], u_Time);
+		posZ += SinusoidalWave(posXY, u_Amplitude[i], u_Length[i], u_Cycle[i], u_Direction[i], u_Time);
 	}
 	vec4 wavePosition = vec4(posXY, posZ, 1.0);
 
