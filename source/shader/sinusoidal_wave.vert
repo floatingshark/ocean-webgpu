@@ -20,6 +20,7 @@ const float INVPI = 1.0 / PI;
 
 float SinusoidalWave(vec2 pos, float A, float rambda, float T, vec2 dir, float t)
 {
+	// f(x) = a sin (kx - ωt)
 	float k = 2.0 * PI / rambda;
 	float x = dot(dir, pos);
 	float omega = 2.0 * PI / T;

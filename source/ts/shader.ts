@@ -251,10 +251,10 @@ export class Shader {
       this.program,
       ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
     );
-	this.uniformLocationWaveLength = this.glContext.getUniformLocation(
-		this.program,
-		ShaderUtility.UNIFORM_WAVE_LENGTH_NAME
-	  );
+    this.uniformLocationWaveLength = this.glContext.getUniformLocation(
+      this.program,
+      ShaderUtility.UNIFORM_WAVE_LENGTH_NAME
+    );
     this.unifromLocationWaveCycle = this.glContext.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_WAVE_CYCLE_NAME
@@ -293,9 +293,9 @@ export class Shader {
     if (this.uniformLocationWaveAmplitude) {
       this.glContext.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
     }
-	if (this.uniformLocationWaveLength) {
-		this.glContext.uniform1fv(this.uniformLocationWaveLength, this.length);
-	  }
+    if (this.uniformLocationWaveLength) {
+      this.glContext.uniform1fv(this.uniformLocationWaveLength, this.length);
+    }
     if (this.unifromLocationWaveCycle) {
       this.glContext.uniform1fv(this.unifromLocationWaveCycle, this.cycle);
     }
@@ -409,7 +409,7 @@ export class Shader {
    */
   protected calculateWaveContext(): boolean {
     this.amplitude.length = this.waveNumber;
-	this.length.length = this.waveNumber;
+    this.length.length = this.waveNumber;
     this.cycle.length = this.waveNumber;
     this.direction.length = this.waveNumber;
     return true;
