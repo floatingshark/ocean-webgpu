@@ -1,7 +1,7 @@
 import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
-import VERTEX_SHADER_OVERLAP from '@shader/overlap.vert';
-import VERTEX_SHADER_FFT from '@shader/fft.vert';
+import VERTEX_SHADER_SYNTHESIS from '@shader/synthesis_wave.vert';
+import VERTEX_SHADER_FFT from '@shader/fft_wave.vert';
 
 /**
  * OpenGL shader util export functions and parameters
@@ -11,7 +11,7 @@ export const VERTEX_SHADER_UNRIT_SOURCE = VERTEX_SHADER_UNRIT;
 /** a unlit fragment shader raw source code */
 export const FRAGMENT_SHADER_UNRIT_SOURCE = FRAGMENT_SHADER_UNRIT;
 /** a gaussian wave shader raw source code */
-export const VERTEX_SHADER_OVERLAP_SOURCE = VERTEX_SHADER_OVERLAP;
+export const VERTEX_SHADER_SYNTHESIS_SOURCE = VERTEX_SHADER_SYNTHESIS;
 /** a fft wave shader raw source code */
 export const VERTEX_SHADER_FFT_SOURCE = VERTEX_SHADER_FFT;
 

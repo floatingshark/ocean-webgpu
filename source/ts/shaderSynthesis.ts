@@ -44,7 +44,7 @@ export class ShaderOverlap extends Shader {
     super.initialize();
 
     this.drawType = 1;
-    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_OVERLAP_SOURCE;
+    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_SYNTHESIS_SOURCE;
     this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
     ShaderUtility.generateSubdividedMesh2d(8, 8, this.vertexArray, this.colorArray, this.indexArray);
 
