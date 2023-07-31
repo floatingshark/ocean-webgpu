@@ -1,7 +1,7 @@
 import * as ShaderUtility from '@ts/shaderUtility';
 import { Shader } from './shader';
 
-export class ShaderOverlap extends Shader {
+export class ShaderSyntesis extends Shader {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
     this.initialize();

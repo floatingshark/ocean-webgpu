@@ -1,6 +1,6 @@
 import * as glm from 'gl-matrix';
 import { Shader } from '@ts/shader';
-import { ShaderOverlap as ShaderSyntesis } from '@ts/shaderSynthesis';
+import { ShaderSyntesis } from '@ts/shaderSynthesis';
 
 /**
  * Canvas element class for webgl
