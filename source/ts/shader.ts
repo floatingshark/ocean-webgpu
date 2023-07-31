@@ -79,6 +79,8 @@ export class Shader {
   /** 4x4 projection matrix */
   protected projectionMatrix: glm.mat4 = glm.mat4.create();
 
+  /** uniform location of time value */
+  protected uniformLocationTime: WebGLUniformLocation | null = null;
   /** current animation time */
   protected time: number = 0.0;
 
@@ -222,6 +224,7 @@ export class Shader {
       this.program,
       ShaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
+    this.uniformLocationTime = this.glContext.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
     return true;
   }
 
@@ -242,6 +245,9 @@ export class Shader {
     }
     if (this.uniformLocationProjectionMatrix) {
       this.glContext.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
+    }
+    if (this.uniformLocationTime) {
+      this.glContext.uniform1f(this.uniformLocationTime, this.time);
     }
 
     return true;
