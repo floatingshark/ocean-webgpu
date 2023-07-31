@@ -88,7 +88,7 @@ export class ShaderSyntesis extends Shader {
       return false;
     }
 
-    super.registerUniform()
+    super.registerUniform();
 
     if (this.uniformLocationTime) {
       this.glContext.uniform1f(this.uniformLocationTime, this.time);

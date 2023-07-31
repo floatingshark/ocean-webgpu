@@ -32,9 +32,9 @@ export class Shader {
   protected indexBuffer: WebGLBuffer | null = null;
 
   /** attribute location of vertices */
-  protected vertexAttribLocation: number = 0;
+  protected attribLocationVertex: number = 0;
   /** attribute location of vertix colors */
-  protected colorAttribLocation: number = 0;
+  protected attribLocationColor: number = 1;
 
   /** a vertex 2D array for attribute vertex buffer */
   protected vertexArray: number[][] = ShaderUtility.MESH_2D_VERTICE;
@@ -125,8 +125,8 @@ export class Shader {
       this.glContext.useProgram(this.program);
 
       if (this.program) {
-        this.vertexAttribLocation = this.glContext.getAttribLocation(this.program, 'in_VertexPosition');
-        this.colorAttribLocation = this.glContext.getAttribLocation(this.program, 'in_Color');
+        this.attribLocationVertex = this.glContext.getAttribLocation(this.program, 'in_VertexPosition');
+        this.attribLocationColor = this.glContext.getAttribLocation(this.program, 'in_Color');
       }
     }
     return true;
@@ -146,9 +146,9 @@ export class Shader {
     this.indexBuffer = this.glContext.createBuffer();
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-    this.glContext.enableVertexAttribArray(this.vertexAttribLocation);
+    this.glContext.enableVertexAttribArray(this.attribLocationVertex);
     this.glContext.vertexAttribPointer(
-      this.vertexAttribLocation,
+      this.attribLocationVertex,
       ShaderUtility.VERTEX_SIZE,
       this.glContext.FLOAT,
       false,
@@ -157,9 +157,9 @@ export class Shader {
     );
 
     this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.colorBuffer);
-    this.glContext.enableVertexAttribArray(this.colorAttribLocation);
+    this.glContext.enableVertexAttribArray(this.attribLocationColor);
     this.glContext.vertexAttribPointer(
-      this.colorAttribLocation,
+      this.attribLocationColor,
       ShaderUtility.COLOR_SIZE,
       this.glContext.FLOAT,
       false,
@@ -332,6 +332,11 @@ export class Shader {
 
     return true;
   }
+
+  /**
+   * The function which executed befor update loop
+   */
+  public preUpdate(): void {}
 
   /**
    * Update loop function for canvas animation

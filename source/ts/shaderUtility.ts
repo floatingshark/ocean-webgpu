@@ -19,6 +19,8 @@ export const VERTEX_SHADER_FFT_SOURCE = VERTEX_SHADER_FFT;
 export const VERTEX_SIZE: number = 3;
 /** difinition of color dimension size */
 export const COLOR_SIZE: number = 4;
+/** difinition of spectrum dimension size */
+export const SPECTRUM_SIZE: number = 1;
 /** uniform name of model matrix in shader program */
 export const UNIFORM_MODEL_MATRIX_NAME: string = 'u_ModelMatrix';
 /** uniform name of view matrix in shader program */
@@ -39,6 +41,8 @@ export const UNIFORM_WAVE_CYCLE_NAME: string = 'u_Cycle';
 export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
 /** uniform name of wave frequency in shader program */
 export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
+/** uniform name of initial spectrum in shade program */
+export const UNIFORM_SPECTRUM_NAME: string = 'u_Spectrum';
 
 /**
  * compile vertex shader and get shader object
@@ -106,11 +110,11 @@ export function createProgram(
 
 /**
  * create plane mesh like a graph paper
- * @param {number} size plane mesh size ex. max vertex position = [size, size];
+ * @param {number} size generated plane mesh size, last position is [size, size];
  * @param {number} division number of division
  * @param {number[]} vertice out vertex array for attribute buffer
  * @param {number[]} colors out color array for attribute buffer
- * @param {number[]} indice [caution] out index array is a bit weird
+ * @param {number[]} indice [caution] out index array is a bit weird for line draw
  */
 export function generateSubdividedMesh2d(
   size: number,
@@ -126,7 +130,7 @@ export function generateSubdividedMesh2d(
   colors.length = division * division;
   indice.length = division * division;
 
-  const lattice: number = division + 1;
+  const lattice: number = division;
   for (let y = 0; y < lattice; y++) {
     for (let x = 0; x < lattice; x++) {
       const index: number = x + lattice * y;
@@ -148,6 +152,25 @@ export function generateSubdividedMesh2d(
   }
 
   return;
+}
+
+/**
+ * create gaussian random by Box–Muller's method
+ * @param {number[]} seed two uniform random numbers for gaussian random generator
+ * @param {number} out1 result 1
+ * @param {number} out2 result 2
+ */
+export function generateGaussianRandom(seed: number[], out: number[]) {
+  if (seed.length > 1 && out.length > 0) {
+    const log = -2.0 * Math.log(seed[0]);
+    const R = log <= 0.0 ? 0.0 : Math.sqrt(log);
+    const theta = 2 * Math.PI * seed[1];
+    out[0] = R * Math.cos(theta);
+    if (out.length > 1) {
+      out[1] = R * Math.sin(theta);
+    }
+    return;
+  }
 }
 
 // prettier-ignore

@@ -1,6 +1,7 @@
 import * as glm from 'gl-matrix';
 import { Shader } from '@ts/shader';
-import { ShaderSyntesis } from '@ts/shaderSynthesis';
+//import { ShaderSyntesis } from '@ts/shaderSynthesis';
+import { ShaderFFT } from '@ts/shaderFFT';
 
 /**
  * Canvas element class for webgl
@@ -14,7 +15,7 @@ export class Canvas {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
 
     if (this.canvas !== null) {
-      this.shader = new ShaderSyntesis(this.canvas);
+      this.shader = new ShaderFFT(this.canvas);
       this.initializeEventListener();
     }
   }
@@ -109,6 +110,10 @@ export class Canvas {
       });
     }
 
+    if(this.shader)
+    {
+      this.shader.preUpdate();
+    }
     while (this.canvas) {
       const prevTime = Date.now();
       await animationFramePromise();
@@ -122,10 +127,7 @@ export class Canvas {
    * @param {number} deltaTime duration time between current and prev frame
    */
   protected update(deltaTime: number): void {
-    if (!this.canvas || !this.shader) {
-      return;
-    }
-    if (deltaTime <= 0.0) {
+    if (!this.canvas || !this.shader || deltaTime <= 0.0) {
       return;
     }
 
