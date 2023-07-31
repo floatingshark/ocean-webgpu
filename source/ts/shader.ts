@@ -10,17 +10,7 @@ export class Shader {
    */
   constructor(canvas: HTMLCanvasElement) {
     this.glContext = canvas.getContext('webgl2');
-
-    ShaderUtility.generateSubdividedMesh2d(16, 32, this.vertexArray, this.colorArray, this.indexArray);
-    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_OVERLAP_SOURCE;
-
-    this.initializeShader();
-    this.initializeAttribute();
-    this.registerAttribute();
-    this.initializeUniformLocation();
-    this.registerUniform();
-
-    this.draw();
+    this.initialize();
   }
 
   /** webgl2.0 context this canvas */
@@ -31,6 +21,8 @@ export class Shader {
   protected fragmentShaderSource: string = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
   /** current shader program */
   protected program: WebGLProgram | null = null;
+  /** current shader draw type */
+  protected drawType: number = 0;
 
   /** attribute buffer of vertices */
   protected vertexBuffer: WebGLBuffer | null = null;
@@ -57,18 +49,6 @@ export class Shader {
   protected uniformLocationViewMatrix: WebGLUniformLocation | null = null;
   /** uniform location of projection matrix */
   protected uniformLocationProjectionMatrix: WebGLUniformLocation | null = null;
-  /** uniform location of time value */
-  protected uniformLocationTime: WebGLUniformLocation | null = null;
-  /** uniform location of wave number */
-  protected uniformLocationWaveNumber: WebGLUniformLocation | null = null;
-  /** uniform location of wave amplitude[A] */
-  protected uniformLocationWaveAmplitude: WebGLUniformLocation | null = null;
-  /** uniform location of wave length[λ] */
-  protected uniformLocationWaveLength: WebGLUniformLocation | null = null;
-  /** uniform location of wave speed[S] */
-  protected unifromLocationWaveCycle: WebGLUniformLocation | null = null;
-  /** uniform location of wave direction[D] */
-  protected uniformLocationWaveDirection: WebGLUniformLocation | null = null;
 
   /** model position */
   protected position: glm.vec3 = [0.0, 0.0, 0.0];
@@ -101,27 +81,27 @@ export class Shader {
 
   /** current animation time */
   protected time: number = 0.0;
-  /** wave number >= 1 and integer */
-  protected waveNumber: number = 4;
-  /** each wave max height */
-  protected amplitude: number[] = [0.3, 0.2, 0.3, 0.05];
-  /** each wave length */
-  protected length: number[] = [4.0, 4.2, 3.5, 3.1];
-  /** each wave cycle - being different is better */
-  protected cycle: number[] = [3200, 2700, 3500, 1000];
-  /** each wave direction being different is better */
-  protected direction: number[][] = [
-    [0.5, 0.7],
-    [-0.6, -0.2],
-    [0.7, -0.4],
-    [-0.2, 0.4],
-  ];
+
+  protected initialize(): boolean {
+    if (!this.glContext) {
+      return false;
+    }
+
+    this.initializeShaderProgram();
+    this.initializeAttribute();
+    this.registerAttribute();
+    this.initializeUniformLocation();
+    this.registerUniform();
+    this.draw();
+
+    return true;
+  }
 
   /**
    * Setup shader program
    * @returns {boolean} setup is success or not
    */
-  protected initializeShader(): boolean {
+  protected initializeShaderProgram(): boolean {
     if (!this.glContext) {
       return false;
     }
@@ -242,27 +222,6 @@ export class Shader {
       this.program,
       ShaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
-    this.uniformLocationTime = this.glContext.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
-    this.uniformLocationWaveNumber = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_NUMBER_NAME
-    );
-    this.uniformLocationWaveAmplitude = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
-    );
-    this.uniformLocationWaveLength = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_LENGTH_NAME
-    );
-    this.unifromLocationWaveCycle = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_CYCLE_NAME
-    );
-    this.uniformLocationWaveDirection = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_DIRECTION_NAME
-    );
     return true;
   }
 
@@ -284,24 +243,6 @@ export class Shader {
     if (this.uniformLocationProjectionMatrix) {
       this.glContext.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
     }
-    if (this.uniformLocationTime) {
-      this.glContext.uniform1f(this.uniformLocationTime, this.time);
-    }
-    if (this.uniformLocationWaveNumber) {
-      this.glContext.uniform1i(this.uniformLocationWaveNumber, this.waveNumber);
-    }
-    if (this.uniformLocationWaveAmplitude) {
-      this.glContext.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
-    }
-    if (this.uniformLocationWaveLength) {
-      this.glContext.uniform1fv(this.uniformLocationWaveLength, this.length);
-    }
-    if (this.unifromLocationWaveCycle) {
-      this.glContext.uniform1fv(this.unifromLocationWaveCycle, this.cycle);
-    }
-    if (this.uniformLocationWaveDirection) {
-      this.glContext.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
-    }
 
     return true;
   }
@@ -316,31 +257,13 @@ export class Shader {
     }
 
     const INDEX_LENGTH: number = this.indexArray.flat().length;
-    //this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
-    this.glContext.drawElements(this.glContext.LINE_STRIP, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+    if (this.drawType == 0) {
+      this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+    } else {
+      this.glContext.drawElements(this.glContext.LINE_STRIP, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+    }
     this.glContext.flush();
     return true;
-  }
-
-  /**
-   * Update loop function for canvas animation
-   * @param {number} deltaTime duration time between current and prev frame
-   */
-  public update(deltaTime: number) {
-    if (!this.glContext || deltaTime <= 0.0) {
-      return;
-    }
-
-    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
-
-    this.time += deltaTime;
-    this.calculateMvpMatrices();
-    this.calculateWaveContext();
-
-    this.registerAttribute();
-    this.registerUniform();
-    this.draw();
   }
 
   /**
@@ -404,14 +327,23 @@ export class Shader {
     return true;
   }
 
-  /** Calc wave contexts - amplitude, speed, direction, frequency
-   * @returns {boolean} calced successfully or not
+  /**
+   * Update loop function for canvas animation
+   * @param {number} deltaTime duration time between current and prev frame
    */
-  protected calculateWaveContext(): boolean {
-    this.amplitude.length = this.waveNumber;
-    this.length.length = this.waveNumber;
-    this.cycle.length = this.waveNumber;
-    this.direction.length = this.waveNumber;
-    return true;
+  public update(deltaTime: number) {
+    if (!this.glContext || deltaTime <= 0.0) {
+      return;
+    }
+
+    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+
+    this.time += deltaTime;
+    this.calculateMvpMatrices();
+
+    this.registerAttribute();
+    this.registerUniform();
+    this.draw();
   }
 }

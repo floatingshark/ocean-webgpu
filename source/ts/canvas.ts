@@ -1,5 +1,6 @@
 import * as glm from 'gl-matrix';
 import { Shader } from '@ts/shader';
+import { ShaderOverlap } from '@ts/shaderOverlap';
 
 /**
  * Canvas element class for webgl
@@ -13,7 +14,7 @@ export class Canvas {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
 
     if (this.canvas !== null) {
-      this.shader = new Shader(this.canvas);
+      this.shader = new ShaderOverlap(this.canvas);
       this.initializeEventListener();
     }
   }
