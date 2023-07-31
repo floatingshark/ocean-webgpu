@@ -12,7 +12,7 @@ export class Shader {
     this.glContext = canvas.getContext('webgl2');
 
     ShaderUtility.generateSubdividedMesh2d(16, 32, this.vertexArray, this.colorArray, this.indexArray);
-    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_SINUSOIDAL_WAVE_SOURCE;
+    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_OVERLAP_SOURCE;
 
     this.initializeShader();
     this.initializeAttribute();

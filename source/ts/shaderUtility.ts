@@ -1,6 +1,7 @@
 import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
-import VERTEX_STOKES_WAVE from '@shader/sinusoidal_wave.vert';
+import VERTEX_SHADER_OVERLAP from '@shader/overlap.vert';
+import VERTEX_SHADER_FFT from '@shader/fft.vert';
 
 /**
  * OpenGL shader util export functions and parameters
@@ -9,8 +10,10 @@ import VERTEX_STOKES_WAVE from '@shader/sinusoidal_wave.vert';
 export const VERTEX_SHADER_UNRIT_SOURCE = VERTEX_SHADER_UNRIT;
 /** a unlit fragment shader raw source code */
 export const FRAGMENT_SHADER_UNRIT_SOURCE = FRAGMENT_SHADER_UNRIT;
-/** a stokes wave shader raw source code */
-export const VERTEX_SHADER_SINUSOIDAL_WAVE_SOURCE = VERTEX_STOKES_WAVE;
+/** a gaussian wave shader raw source code */
+export const VERTEX_SHADER_OVERLAP_SOURCE = VERTEX_SHADER_OVERLAP;
+/** a fft wave shader raw source code */
+export const VERTEX_SHADER_FFT_SOURCE = VERTEX_SHADER_FFT;
 
 /** difinition of vertex dimension size */
 export const VERTEX_SIZE: number = 3;
