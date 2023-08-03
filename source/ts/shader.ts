@@ -2,7 +2,7 @@ import * as ShaderUtility from '@ts/shaderUtility';
 import * as glm from 'gl-matrix';
 
 /**
- * WebGL shader class
+ * WebGL basic shader class
  */
 export class Shader {
   /**
@@ -84,6 +84,9 @@ export class Shader {
   /** current animation time */
   protected time: number = 0.0;
 
+  /**
+   * Initializer function which would called in constructor
+   */
   protected initialize(): boolean {
     if (!this.glContext) {
       return false;
@@ -91,10 +94,7 @@ export class Shader {
 
     this.initializeShaderProgram();
     this.initializeAttribute();
-    this.registerAttribute();
     this.initializeUniformLocation();
-    this.registerUniform();
-    this.draw();
 
     return true;
   }
@@ -336,7 +336,11 @@ export class Shader {
   /**
    * The function which executed befor update loop
    */
-  public preUpdate(): void {}
+  public preUpdate(): void {
+    this.registerAttribute();
+    this.registerUniform();
+    this.draw();
+  }
 
   /**
    * Update loop function for canvas animation

@@ -110,8 +110,7 @@ export class Canvas {
       });
     }
 
-    if(this.shader)
-    {
+    if (this.shader) {
       this.shader.preUpdate();
     }
     while (this.canvas) {
