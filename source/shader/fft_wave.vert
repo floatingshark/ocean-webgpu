@@ -82,8 +82,8 @@ void main() {
 	out_Color = in_VertexColor;
 
 	int index = in_vertexIndex;
-	int y_index = int(index / u_N);
 	int x_index = index % u_N;
+	int y_index = int(index / u_N);
 	out_Ht = GenerateSpectrumKernel(x_index, y_index);
 
 	int x = x_index - u_N / 2;
