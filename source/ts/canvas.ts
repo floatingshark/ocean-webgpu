@@ -131,7 +131,7 @@ export class Canvas {
     while (this.canvas) {
       await animationFramePromise();
       const deltaTime = Date.now() - prevTime;
-      if (deltaTime > FPS_30 * 2) {
+      if (deltaTime > FPS_30) {
         prevTime = Date.now();
         this.update(deltaTime);
       }

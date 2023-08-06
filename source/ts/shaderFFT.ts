@@ -14,9 +14,10 @@ export class ShaderFFT extends Shader {
 
   protected size: number = 5.0;
   protected N: number = 16;
-  protected A: number = 0.3;
-  protected T: number = 500.0;
+  protected A: number = 0.5;
+  protected T: number = 1000.0;
   protected f: number = 1.0;
+  protected phi: number = 10000000.0;
   protected h0ReData: ImageData = new ImageData(this.N, this.N);
   protected h0ImData: ImageData = new ImageData(this.N, this.N);
 
@@ -24,6 +25,7 @@ export class ShaderFFT extends Shader {
   protected uniformLocationA: WebGLUniformLocation | null = null;
   protected uniformLocationT: WebGLUniformLocation | null = null;
   protected uniformLocationF: WebGLUniformLocation | null = null;
+  protected uniformLocationPhi: WebGLUniformLocation | null = null;
   protected uniformLocationTexH0Re: WebGLUniformLocation | null = null;
   protected uniformLocationTexH0Im: WebGLUniformLocation | null = null;
 
@@ -86,6 +88,7 @@ export class ShaderFFT extends Shader {
     this.uniformLocationA = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_A_NAME);
     this.uniformLocationT = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_T_NAME);
     this.uniformLocationF = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_F_NAME);
+    this.uniformLocationPhi = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_PHI_NAME);
     this.uniformLocationTexH0Re = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_REAL_NAME);
     this.uniformLocationTexH0Im = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_IMAGINARY_NAME);
 
@@ -115,6 +118,10 @@ export class ShaderFFT extends Shader {
 
     if (this.uniformLocationF) {
       this.gl.uniform1f(this.uniformLocationF, this.f);
+    }
+
+    if (this.uniformLocationPhi) {
+      this.gl.uniform1f(this.uniformLocationPhi, this.phi);
     }
 
     if (this.uniformLocationTexH0Re && this.textureH0Re) {

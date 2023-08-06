@@ -12,6 +12,7 @@ uniform int u_N;
 uniform float u_A;
 uniform float u_T;
 uniform float u_f;
+uniform float u_Phi;
 uniform sampler2D u_texH0Re;
 uniform sampler2D u_texH0Im;
 out vec4 out_Color;
@@ -74,7 +75,8 @@ vec2 generate_spectrum(int x_index, int y_index)
 	return complex_add(complex_mult(h0_k, complex_exp(omega * t)), complex_mult(conjugate(h0_mk), complex_exp(-omega * t)));
 }
 
-void main() {
+void main() 
+{
 	out_Color = in_VertexColor;
 
 	int index = in_vertexIndex;
@@ -88,11 +90,11 @@ void main() {
 	vec2 dftsum;
 	for (int j = 0; j < u_N; j++)
 	{
-		int ky = -u_N / 2 + j;//* (2.0f * PI / N);
+		int ky = -u_N / 2 + j;
 		for (int i = 0; i < u_N; i++)
 		{
-			int kx = -u_N / 2 + i;// *(2.0f * PI / N);
-			float rad = float((kx * x + ky * y) % u_N) * (2.0f * PI / float(u_N)) * u_f;
+			int kx = -u_N / 2 + i;
+			float rad = float((kx * x + ky * y) % u_N) * (2.0f * PI / float(u_N)) * u_f + u_Phi;
 			vec2 h = generate_spectrum(i, j);
 			dftsum.x += h.x * cos(rad) - h.y * sin(rad);
 			dftsum.y += h.y * cos(rad) + h.x * sin(rad);
