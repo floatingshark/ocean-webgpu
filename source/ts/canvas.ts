@@ -88,6 +88,9 @@ export class Canvas {
         // temp Y movement(not orbital rotate)
         const MOVEMENT_MAGNITUDE: number = 0.01;
         view[2] += e.movementY * MOVEMENT_MAGNITUDE;
+        if (this.shader) {
+          this.shader.viewPosition = view;
+        }
       }
     });
 
@@ -99,9 +102,10 @@ export class Canvas {
       let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
       zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
       glm.vec3.add(view, view, zoomVec);
+      if (this.shader) {
+        this.shader.viewPosition = view;
+      }
     });
-
-    this.shader.viewPosition = view;
 
     return true;
   }
