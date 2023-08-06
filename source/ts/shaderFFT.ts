@@ -13,11 +13,11 @@ export class ShaderFFT extends Shader {
   protected vertexIndex: number[] = [];
 
   protected size: number = 5.0;
-  protected N: number = 16;
-  protected A: number = 0.5;
-  protected T: number = 1000.0;
+  protected N: number = 32;
+  protected A: number = 0.2;
+  protected T: number = 200.0;
   protected f: number = 1.0;
-  protected phi: number = 10000000.0;
+  protected phi: number = 50000;
   protected h0ReData: ImageData = new ImageData(this.N, this.N);
   protected h0ImData: ImageData = new ImageData(this.N, this.N);
 

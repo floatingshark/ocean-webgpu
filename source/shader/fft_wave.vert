@@ -61,7 +61,7 @@ vec2 generate_spectrum(int x_index, int y_index)
 	float k_len = sqrt(k.x * k.x + k.y * k.y);
 	float omega = sqrt(9.81 * k_len);
 
-	float t = u_Time / u_T;
+	float t = u_Time / (u_T * 2.0 * PI);
 
 	vec2 uv = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
 	vec2 uv_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 - y_index) / float(u_N));
