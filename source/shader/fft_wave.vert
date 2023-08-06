@@ -13,6 +13,8 @@ uniform float u_Time;
 uniform int u_N;
 uniform float u_A;
 uniform sampler2D u_texH0;
+uniform sampler2D u_texH0Re;
+uniform sampler2D u_texH0Im;
 out vec4 out_Color;
 out vec2 out_Ht;
 out vec2 out_UV;
@@ -20,6 +22,10 @@ out vec2 out_UV_m;
 
 const float PI  = 3.1415926;
 const float INVPI = 1.0 / PI;
+
+float decode_RGBA_to_float(vec4 rgba ) {
+  return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0) );
+}
 
 vec2 conjugate(vec2 arg)
 {
@@ -54,12 +60,18 @@ vec2 GenerateSpectrumKernel(int x_index, int y_index)
 	float k_len = sqrt(k.x * k.x + k.y * k.y);
 	float omega = sqrt(9.81f * k_len);
 
-	//vec2 h0_k = in_H0 * sqrt(u_A * 0.5);
-	//vec2 h0_mk = in_H0m * sqrt(u_A * 0.5);
+	//vec2 h0_k = in_H0 * sqrt(u_A * 0.5) * 1.0;
+	//vec2 h0_mk = in_H0m * sqrt(u_A * 0.5) * 1.0;
 	vec2 uv = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
 	vec2 uv_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 - y_index) / float(u_N));
-	vec2 h0_k = vec2(texture(u_texH0, uv)) * sqrt(u_A * 0.5);
-	vec2 h0_mk = vec2(texture(u_texH0, uv_m)) * sqrt(u_A * 0.5);
+	vec4 rgba_re = texture(u_texH0Re, uv);
+	vec4 rgba_im = texture(u_texH0Im, uv);
+	vec4 rgba_m_re = texture(u_texH0Re, uv_m);
+	vec4 rgba_m_im = texture(u_texH0Im, uv_m);
+	//vec2 h0_k = vec2(texture(u_texH0, uv)) * sqrt(u_A * 0.5) * 1000.0;
+	//vec2 h0_mk = vec2(texture(u_texH0, uv_m)) * sqrt(u_A * 0.5) * 1000.0;
+	vec2 h0_k = vec2(decode_RGBA_to_float(rgba_re), decode_RGBA_to_float(rgba_im)) * sqrt(u_A * 0.5) * 10.0;
+	vec2 h0_mk = vec2(decode_RGBA_to_float(rgba_m_re), decode_RGBA_to_float(rgba_m_im)) * sqrt(u_A * 0.5);
 	return complex_add(complex_mult(h0_k, complex_exp(omega * u_Time)), complex_mult(conjugate(h0_mk), complex_exp(-omega * u_Time)));
 }
 

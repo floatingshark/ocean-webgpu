@@ -50,8 +50,10 @@ export const UNIFORM_N_NAME: string = 'u_N';
 export const UNIFORM_A_NAME: string = 'u_A';
 /** uniform name of initial spectrum texture in shade program */
 export const UNIFORM_H0_NAME: string = 'u_texH0';
-/** uniform name of mirrored initial spectrum texture in shade program */
-export const UNIFORM_H0M_NAME: string = 'u_texH0m';
+/** uniform name of initial spectrum real part encoded rgba texture in shade program */
+export const UNIFORM_H0_REAL_NAME: string = 'u_texH0Re';
+/** uniform name of initial spectrum imaginary part encoded rgba texture in shade program */
+export const UNIFORM_H0_IMAGINARY_NAME: string = 'u_texH0Im';
 
 /**
  * compile vertex shader and get shader object

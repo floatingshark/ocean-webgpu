@@ -18,12 +18,18 @@ export class ShaderFFT extends Shader {
   protected h0: number[][] = [];
   protected h0m: number[][] = [];
   protected h0ImageData: ImageData = new ImageData(this.N, this.N);
+  protected h0ReData: ImageData = new ImageData(this.N, this.N);
+  protected h0ImData: ImageData = new ImageData(this.N, this.N);
 
   protected uniformLocationN: WebGLUniformLocation | null = null;
   protected uniformLocationA: WebGLUniformLocation | null = null;
   protected uniformLocationTexH0: WebGLUniformLocation | null = null;
+  protected uniformLocationTexH0Re: WebGLUniformLocation | null = null;
+  protected uniformLocationTexH0Im: WebGLUniformLocation | null = null;
 
   protected textureH0: WebGLTexture | null = null;
+  protected textureH0Re: WebGLTexture | null = null;
+  protected textureH0Im: WebGLTexture | null = null;
 
   protected vertexIndexBuffer: WebGLBuffer | null = null;
   protected h0Buffer: WebGLBuffer | null = null;
@@ -103,8 +109,12 @@ export class ShaderFFT extends Shader {
     this.uniformLocationN = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_N_NAME);
     this.uniformLocationA = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_A_NAME);
     this.uniformLocationTexH0 = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_NAME);
+    this.uniformLocationTexH0Re = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_REAL_NAME);
+    this.uniformLocationTexH0Im = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_IMAGINARY_NAME);
 
     this.textureH0 = this.gl.createTexture();
+    this.textureH0Re = this.gl.createTexture();
+    this.textureH0Im = this.gl.createTexture();
 
     return true;
   }
@@ -131,6 +141,26 @@ export class ShaderFFT extends Shader {
       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
       this.gl.uniform1i(this.uniformLocationTexH0, 0);
+    }
+
+    if (this.uniformLocationTexH0Re && this.textureH0Re) {
+      this.gl.activeTexture(this.gl.TEXTURE1);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureH0Re);
+      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.h0ReData);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+      this.gl.uniform1i(this.uniformLocationTexH0Re, 1);
+    }
+
+    if (this.uniformLocationTexH0Im && this.textureH0Im) {
+      this.gl.activeTexture(this.gl.TEXTURE2);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureH0Im);
+      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.h0ImData);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+      this.gl.uniform1i(this.uniformLocationTexH0Im, 2);
     }
 
     return true;
@@ -196,8 +226,22 @@ export class ShaderFFT extends Shader {
         this.h0ImageData.data[imageDataIndex] = h0_i[0] * 1000;
         this.h0ImageData.data[imageDataIndex + 1] = h0_i[1] * 1000;
         this.h0ImageData.data[imageDataIndex + 3] = 255;
+
+        const reRGBA: number[] = this.encodeFloatToRGBA(h0_i[0]);
+        this.h0ReData.data[imageDataIndex] = reRGBA[0];
+        this.h0ReData.data[imageDataIndex + 1] = reRGBA[1];
+        this.h0ReData.data[imageDataIndex + 2] = reRGBA[2];
+        this.h0ReData.data[imageDataIndex + 3] = reRGBA[3];
+
+        const imRGBA: number[] = this.encodeFloatToRGBA(h0_i[1]);
+        this.h0ImData.data[imageDataIndex] = imRGBA[0];
+        this.h0ImData.data[imageDataIndex + 1] = imRGBA[1];
+        this.h0ImData.data[imageDataIndex + 2] = imRGBA[2];
+        this.h0ImData.data[imageDataIndex + 3] = imRGBA[3];
       }
     }
+
+    console.log(this.h0ImData);
 
     return true;
   }
@@ -226,7 +270,15 @@ export class ShaderFFT extends Shader {
     super.update(deltaTime);
   }
 
-  protected encodeFloatToRGBA(): boolean {
-    return true;
+  protected encodeFloatToRGBA(inFloat: number): number[] {
+    const v1: number = inFloat * 255.0;
+    const r: number = Math.floor(v1);
+    const v2: number = (v1 - r) * 255.0;
+    const g: number = Math.floor(v2);
+    const v3: number = (v2 - g) * 255.0;
+    const b: number = Math.floor(v3);
+    const v4: number = (v3 - b) * 255.0;
+    const a: number = Math.floor(v4);
+    return [r, g, b, a];
   }
 }
