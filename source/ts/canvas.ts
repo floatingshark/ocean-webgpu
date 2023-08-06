@@ -110,14 +110,21 @@ export class Canvas {
       });
     }
 
+    // pre update
     if (this.shader) {
       this.shader.preUpdate();
     }
+
+    // execute update loop
+    const FPS_30 = 33.33;
+    let prevTime = Date.now();
     while (this.canvas) {
-      const prevTime = Date.now();
       await animationFramePromise();
       const deltaTime = Date.now() - prevTime;
-      this.update(deltaTime);
+      if (deltaTime > FPS_30 * 2) {
+        prevTime = Date.now();
+        this.update(deltaTime);
+      }
     }
   }
 
