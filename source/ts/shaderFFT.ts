@@ -14,20 +14,16 @@ export class ShaderFFT extends Shader {
 
   protected size: number = 1.0;
   protected N: number = 64;
-  protected g: number = 9.81;
   protected A: number = 0.1;
   protected h0: number[][] = [];
   protected h0m: number[][] = [];
   protected h0ImageData: ImageData = new ImageData(this.N, this.N);
-  protected h0mImageData: ImageData = new ImageData(this.N, this.N);
 
   protected uniformLocationN: WebGLUniformLocation | null = null;
   protected uniformLocationA: WebGLUniformLocation | null = null;
   protected uniformLocationTexH0: WebGLUniformLocation | null = null;
-  protected uniformLocationTexH0m: WebGLUniformLocation | null = null;
 
   protected textureH0: WebGLTexture | null = null;
-  protected textureH0m: WebGLTexture | null = null;
 
   protected vertexIndexBuffer: WebGLBuffer | null = null;
   protected h0Buffer: WebGLBuffer | null = null;
@@ -107,10 +103,8 @@ export class ShaderFFT extends Shader {
     this.uniformLocationN = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_N_NAME);
     this.uniformLocationA = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_A_NAME);
     this.uniformLocationTexH0 = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_NAME);
-    this.uniformLocationTexH0m = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0M_NAME);
 
     this.textureH0 = this.gl.createTexture();
-    this.textureH0m = this.gl.createTexture();
 
     return true;
   }
@@ -139,16 +133,6 @@ export class ShaderFFT extends Shader {
       this.gl.uniform1i(this.uniformLocationTexH0, 0);
     }
 
-    if (this.uniformLocationTexH0m && this.textureH0m) {
-      this.gl.activeTexture(this.gl.TEXTURE1);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureH0m);
-      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.h0mImageData);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-      this.gl.uniform1i(this.uniformLocationTexH0m, 1);
-    }
-
     return true;
   }
 
@@ -159,6 +143,7 @@ export class ShaderFFT extends Shader {
   protected calcurateH0(): boolean {
     const Lx = (this.N * 5) / 2;
     const Ly = (this.N * 5) / 2;
+    const g: number = 9.81;
 
     function gauss(): number[] {
       const ret: number[] = [0.0, 0.0];
@@ -194,7 +179,7 @@ export class ShaderFFT extends Shader {
         const kx: number = (-this.N / 2.0 + x) * ((2.0 * Math.PI) / Lx);
         const ky: number = (-this.N / 2.0 + y) * ((2.0 * Math.PI) / Ly);
 
-        let p: number = phillips(kx, ky, 1.0, this.g);
+        let p: number = phillips(kx, ky, 1.0, g);
         if (kx == 0.0 && ky == 0.0) {
           p = 0.0;
         }
@@ -211,12 +196,9 @@ export class ShaderFFT extends Shader {
         this.h0ImageData.data[imageDataIndex] = h0_i[0] * 1000;
         this.h0ImageData.data[imageDataIndex + 1] = h0_i[1] * 1000;
         this.h0ImageData.data[imageDataIndex + 3] = 255;
-        const imageDataIndexMirrored: number = (this.N * this.N - 1 - (x + y * this.N)) * 4;
-        this.h0mImageData.data[imageDataIndexMirrored] = h0_i[0] * 1000;
-        this.h0mImageData.data[imageDataIndexMirrored + 1] = h0_i[1] * 1000;
-        this.h0mImageData.data[imageDataIndexMirrored + 3] = 255;
       }
     }
+
     return true;
   }
 
@@ -242,5 +224,9 @@ export class ShaderFFT extends Shader {
       return;
     }
     super.update(deltaTime);
+  }
+
+  protected encodeFloatToRGBA(): boolean {
+    return true;
   }
 }

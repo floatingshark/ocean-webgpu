@@ -13,10 +13,10 @@ uniform float u_Time;
 uniform int u_N;
 uniform float u_A;
 uniform sampler2D u_texH0;
-uniform sampler2D u_texH0m;
 out vec4 out_Color;
 out vec2 out_Ht;
 out vec2 out_UV;
+out vec2 out_UV_m;
 
 const float PI  = 3.1415926;
 const float INVPI = 1.0 / PI;
@@ -57,8 +57,9 @@ vec2 GenerateSpectrumKernel(int x_index, int y_index)
 	//vec2 h0_k = in_H0 * sqrt(u_A * 0.5);
 	//vec2 h0_mk = in_H0m * sqrt(u_A * 0.5);
 	vec2 uv = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
+	vec2 uv_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 - y_index) / float(u_N));
 	vec2 h0_k = vec2(texture(u_texH0, uv)) * sqrt(u_A * 0.5);
-	vec2 h0_mk = vec2(texture(u_texH0m, uv)) * sqrt(u_A * 0.5);
+	vec2 h0_mk = vec2(texture(u_texH0, uv_m)) * sqrt(u_A * 0.5);
 	return complex_add(complex_mult(h0_k, complex_exp(omega * u_Time)), complex_mult(conjugate(h0_mk), complex_exp(-omega * u_Time)));
 }
 
@@ -71,6 +72,7 @@ void main() {
 	out_Ht = GenerateSpectrumKernel(x_index, y_index);
 
 	out_UV = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
+	out_UV_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 -y_index) / float(u_N));
 
 	mat4 mvpMatrix = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix;
 	vec3 position = in_VertexPosition;
