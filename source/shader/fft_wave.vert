@@ -83,10 +83,29 @@ void main() {
 	int x_index = index % u_N;
 	out_Ht = GenerateSpectrumKernel(x_index, y_index);
 
+	int x = x_index - u_N / 2;
+	int y = y_index - u_N / 2;
+
+	vec2 dftsum;
+	for (int j = 0; j < u_N; j++)
+	{
+		int ky = -u_N / 2 + j;//* (2.0f * PI / N);
+		for (int i = 0; i < u_N; i++)
+		{
+			int kx = -u_N / 2 + i;// *(2.0f * PI / N);
+			float rad = float((kx * x + ky * y) % u_N) * (2.0f * PI / float(u_N));
+			vec2 h = GenerateSpectrumKernel(i, j);
+			dftsum.x += h.x * cos(rad) - h.y * sin(rad);
+			dftsum.y += h.y * cos(rad) + h.x * sin(rad);
+		}
+	}
+
+
 	out_UV = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
 	out_UV_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 -y_index) / float(u_N));
 
 	mat4 mvpMatrix = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix;
 	vec3 position = in_VertexPosition;
+	position[2] += dftsum[0] / 1000.0;
 	gl_Position = mvpMatrix * vec4(position, 1.0);
 }

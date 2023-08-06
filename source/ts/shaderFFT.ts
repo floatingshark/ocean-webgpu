@@ -13,7 +13,7 @@ export class ShaderFFT extends Shader {
   protected vertexIndex: number[] = [];
 
   protected size: number = 1.0;
-  protected N: number = 64;
+  protected N: number = 16;
   protected A: number = 0.1;
   protected h0: number[][] = [];
   protected h0m: number[][] = [];
@@ -45,7 +45,7 @@ export class ShaderFFT extends Shader {
 
     super.initialize();
 
-    this.drawType = 0;
+    this.drawType = 1;
     this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_FFT_SOURCE;
     this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_FFT_SOURCE;
 

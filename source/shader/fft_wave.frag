@@ -16,7 +16,7 @@ float decode_RGBA_to_float(vec4 rgba ) {
 }
 
 void main() {
-  fragment = vec4(out_Ht, 0.0, 1.0);
+  //fragment = vec4(out_Ht, 0.0, 1.0);
 
   //vec4 sampleReRGBA = texture(u_texH0Re, out_UV);
   //vec4 sampleImRGBA = texture(u_texH0Im, out_UV);
@@ -27,5 +27,5 @@ void main() {
   //fragment = vec4(sampleColor, 1.0);
 
   //fragment = texture(u_texH0Re, out_UV);
-  //fragment = vec4(1.0, 1.0, 1.0, 1.0);
+  fragment = vec4(1.0, 1.0, 1.0, 1.0);
 }
