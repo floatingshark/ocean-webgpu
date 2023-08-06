@@ -60,7 +60,7 @@ export class Shader {
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
   /** view position a.k.a camera position */
-  public viewPosition: glm.vec3 = [-1, -2, 5.0];
+  public viewPosition: glm.vec3 = [-1, -2, 0.3];
   /** the position camera look at */
   public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
   /** basis upvector , basically [0, 1, 0] or [0, 0, 0] and it depends on industry */

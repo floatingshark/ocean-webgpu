@@ -4,8 +4,6 @@ precision highp float;
 layout (location = 0) in vec3 in_VertexPosition;
 layout (location = 1) in vec4 in_VertexColor;
 layout (location = 2) in int in_vertexIndex;
-layout (location = 3) in vec2 in_H0;
-layout (location = 4) in vec2 in_H0m;
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ProjectionMatrix;
@@ -13,7 +11,7 @@ uniform float u_Time;
 uniform int u_N;
 uniform float u_A;
 uniform float u_T;
-uniform sampler2D u_texH0;
+uniform float u_f;
 uniform sampler2D u_texH0Re;
 uniform sampler2D u_texH0Im;
 out vec4 out_Color;
@@ -51,30 +49,28 @@ vec2 complex_mult(vec2 ab, vec2 cd)
 	return vec2(ab.x * cd.x - ab.y * cd.y, ab.x * cd.y + ab.y * cd.x);
 }
 
-vec2 GenerateSpectrumKernel(int x_index, int y_index)
+vec2 generate_spectrum(int x_index, int y_index)
 {
 	int Lx = u_N * 5 / 2;
 	int Ly = u_N * 5 / 2;
+
 	vec2 k;
 	k.x = float(- u_N / 2 + x_index) * (2.0 * PI / float(Lx));
 	k.y = float(- u_N / 2 + y_index) * (2.0 * PI / float(Ly));
 	float k_len = sqrt(k.x * k.x + k.y * k.y);
-	float omega = sqrt(9.81f * k_len);
+	float omega = sqrt(9.81 * k_len);
 
 	float t = u_Time / u_T;
 
-	//vec2 h0_k = in_H0 * sqrt(u_A * 0.5) * 1.0;
-	//vec2 h0_mk = in_H0m * sqrt(u_A * 0.5) * 1.0;
 	vec2 uv = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
 	vec2 uv_m = vec2(float(u_N - 1 - x_index) / float(u_N), float(u_N - 1 - y_index) / float(u_N));
 	vec4 rgba_re = texture(u_texH0Re, uv);
 	vec4 rgba_im = texture(u_texH0Im, uv);
 	vec4 rgba_m_re = texture(u_texH0Re, uv_m);
 	vec4 rgba_m_im = texture(u_texH0Im, uv_m);
-	//vec2 h0_k = vec2(texture(u_texH0, uv)) * sqrt(u_A * 0.5) * 1000.0;
-	//vec2 h0_mk = vec2(texture(u_texH0, uv_m)) * sqrt(u_A * 0.5) * 1000.0;
-	vec2 h0_k = vec2(decode_RGBA_to_float(rgba_re), decode_RGBA_to_float(rgba_im)) * sqrt(u_A * 0.5) * 10.0;
+	vec2 h0_k = vec2(decode_RGBA_to_float(rgba_re), decode_RGBA_to_float(rgba_im)) * sqrt(u_A * 0.5);
 	vec2 h0_mk = vec2(decode_RGBA_to_float(rgba_m_re), decode_RGBA_to_float(rgba_m_im)) * sqrt(u_A * 0.5);
+	
 	return complex_add(complex_mult(h0_k, complex_exp(omega * t)), complex_mult(conjugate(h0_mk), complex_exp(-omega * t)));
 }
 
@@ -84,7 +80,7 @@ void main() {
 	int index = in_vertexIndex;
 	int x_index = index % u_N;
 	int y_index = int(index / u_N);
-	out_Ht = GenerateSpectrumKernel(x_index, y_index);
+	out_Ht = generate_spectrum(x_index, y_index);
 
 	int x = x_index - u_N / 2;
 	int y = y_index - u_N / 2;
@@ -96,8 +92,8 @@ void main() {
 		for (int i = 0; i < u_N; i++)
 		{
 			int kx = -u_N / 2 + i;// *(2.0f * PI / N);
-			float rad = float((kx * x + ky * y) % u_N) * (2.0f * PI / float(u_N));
-			vec2 h = GenerateSpectrumKernel(i, j);
+			float rad = float((kx * x + ky * y) % u_N) * (2.0f * PI / float(u_N)) * u_f;
+			vec2 h = generate_spectrum(i, j);
 			dftsum.x += h.x * cos(rad) - h.y * sin(rad);
 			dftsum.y += h.y * cos(rad) + h.x * sin(rad);
 		}
