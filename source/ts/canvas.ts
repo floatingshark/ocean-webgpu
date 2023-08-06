@@ -28,6 +28,8 @@ export class Canvas {
   protected cursorOn: boolean = false;
   /** current animation time */
   protected time: number = 0.0;
+  /** to update or not */
+  protected bUpdate: boolean = true;
 
   /** shader object */
   protected shader: Shader | null = null;
@@ -62,8 +64,12 @@ export class Canvas {
     let view = this.shader.viewPosition;
     const look = this.shader.viewLookAt;
 
-    this.canvas.addEventListener('mousedown', () => {
+    this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
       this.cursorOn = true;
+
+      if (e.button == 1) {
+        this.bUpdate = this.bUpdate ? false : true;
+      }
     });
 
     this.canvas.addEventListener('mouseup', () => {
@@ -133,7 +139,7 @@ export class Canvas {
    * @param {number} deltaTime duration time between current and prev frame
    */
   protected update(deltaTime: number): void {
-    if (!this.canvas || !this.shader || deltaTime <= 0.0) {
+    if (!this.canvas || !this.shader || deltaTime <= 0.0 || !this.bUpdate) {
       return;
     }
 

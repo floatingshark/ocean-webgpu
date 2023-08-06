@@ -55,13 +55,13 @@ vec2 GenerateSpectrumKernel(int x_index, int y_index)
 }
 
 void main() {
-	mat4 mvpMatrix = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix;
-	gl_Position = mvpMatrix * vec4(in_VertexPosition, 1.0);
-
 	out_Color = in_VertexColor;
 
 	int index = in_vertexIndex;
 	int y_index = int(index / u_N);
 	int x_index = index % u_N;
 	out_Ht = GenerateSpectrumKernel(x_index, y_index);
+
+	mat4 mvpMatrix = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix;
+	gl_Position = mvpMatrix * vec4(in_VertexPosition, 1.0);
 }
