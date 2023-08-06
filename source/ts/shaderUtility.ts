@@ -48,6 +48,8 @@ export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
 export const UNIFORM_N_NAME: string = 'u_N';
 /** uniform name of amplitude in shade program */
 export const UNIFORM_A_NAME: string = 'u_A';
+/** uniform name of cycle period in shade program */
+export const UNIFORM_T_NAME: string = 'u_T';
 /** uniform name of initial spectrum texture in shade program */
 export const UNIFORM_H0_NAME: string = 'u_texH0';
 /** uniform name of initial spectrum real part encoded rgba texture in shade program */

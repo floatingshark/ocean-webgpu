@@ -12,6 +12,7 @@ uniform mat4 u_ProjectionMatrix;
 uniform float u_Time;
 uniform int u_N;
 uniform float u_A;
+uniform float u_T;
 uniform sampler2D u_texH0;
 uniform sampler2D u_texH0Re;
 uniform sampler2D u_texH0Im;
@@ -60,6 +61,8 @@ vec2 GenerateSpectrumKernel(int x_index, int y_index)
 	float k_len = sqrt(k.x * k.x + k.y * k.y);
 	float omega = sqrt(9.81f * k_len);
 
+	float t = u_Time / u_T;
+
 	//vec2 h0_k = in_H0 * sqrt(u_A * 0.5) * 1.0;
 	//vec2 h0_mk = in_H0m * sqrt(u_A * 0.5) * 1.0;
 	vec2 uv = vec2(float(x_index) / float(u_N), float(y_index) / float(u_N));
@@ -72,7 +75,7 @@ vec2 GenerateSpectrumKernel(int x_index, int y_index)
 	//vec2 h0_mk = vec2(texture(u_texH0, uv_m)) * sqrt(u_A * 0.5) * 1000.0;
 	vec2 h0_k = vec2(decode_RGBA_to_float(rgba_re), decode_RGBA_to_float(rgba_im)) * sqrt(u_A * 0.5) * 10.0;
 	vec2 h0_mk = vec2(decode_RGBA_to_float(rgba_m_re), decode_RGBA_to_float(rgba_m_im)) * sqrt(u_A * 0.5);
-	return complex_add(complex_mult(h0_k, complex_exp(omega * u_Time)), complex_mult(conjugate(h0_mk), complex_exp(-omega * u_Time)));
+	return complex_add(complex_mult(h0_k, complex_exp(omega * t)), complex_mult(conjugate(h0_mk), complex_exp(-omega * t)));
 }
 
 void main() {
@@ -106,6 +109,6 @@ void main() {
 
 	mat4 mvpMatrix = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix;
 	vec3 position = in_VertexPosition;
-	position[2] += dftsum[0] / 1000.0;
+	position[2] += dftsum[0] / 100.0;
 	gl_Position = mvpMatrix * vec4(position, 1.0);
 }
