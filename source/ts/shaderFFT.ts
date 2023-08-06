@@ -10,70 +10,105 @@ export class ShaderFFT extends Shader {
     this.initialize();
   }
 
-  protected size: number = 1.0;
-  protected lattice: number = 64;
-  protected spectrum: number[][] = [];
+  protected vertexIndex: number[] = [];
 
-  protected spectrumBuffer: WebGLBuffer | null = null;
-  protected attribLocationSpectrum: number = 2;
+  protected size: number = 1.0;
+  protected N: number = 32;
+  protected h0: number[][] = [];
+  protected h0m: number[][] = [];
+
+  protected uniformLocationN: WebGLUniformLocation | null = null;
+
+  protected vertexIndexBuffer: WebGLBuffer | null = null;
+  protected h0Buffer: WebGLBuffer | null = null;
+  protected h0mBuffer: WebGLBuffer | null = null;
+  protected attribLocationVertexIndex: number = 2;
+  protected attribLocationH0: number = 3;
+  protected attribLocationH0m: number = 4;
 
   protected initialize(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
     super.initialize();
 
-    this.drawType = 1;
+    this.drawType = 0;
     this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_FFT_SOURCE;
-    this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
+    this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_FFT_SOURCE;
 
     return true;
   }
 
   protected initializeAttribute(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
     super.initializeAttribute();
 
-    this.spectrumBuffer = this.glContext.createBuffer();
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.spectrumBuffer);
-    this.glContext.enableVertexAttribArray(this.attribLocationSpectrum);
-    this.glContext.vertexAttribPointer(this.attribLocationSpectrum, 2, this.glContext.FLOAT, false, 0, 0);
+    this.vertexIndexBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexIndexBuffer);
+    this.gl.enableVertexAttribArray(this.attribLocationVertexIndex);
+    this.gl.vertexAttribIPointer(this.attribLocationVertexIndex, 1, this.gl.INT, 0, 0);
+
+    this.h0Buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.h0Buffer);
+    this.gl.enableVertexAttribArray(this.attribLocationH0);
+    this.gl.vertexAttribPointer(this.attribLocationH0, 2, this.gl.FLOAT, false, 0, 0);
+
+    this.h0mBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.h0mBuffer);
+    this.gl.enableVertexAttribArray(this.attribLocationH0m);
+    this.gl.vertexAttribPointer(this.attribLocationH0m, 2, this.gl.FLOAT, false, 0, 0);
 
     return true;
   }
 
   protected registerAttribute(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
     super.registerAttribute();
 
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.spectrumBuffer);
-    this.glContext.bufferData(
-      this.glContext.ARRAY_BUFFER,
-      new Float32Array(this.spectrum.flat()),
-      this.glContext.STATIC_DRAW
-    );
+    if (this.vertexIndexBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexIndexBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Int32Array(this.vertexIndex), this.gl.STATIC_DRAW);
+    }
+
+    if (this.h0Buffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.h0Buffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.h0.flat()), this.gl.STATIC_DRAW);
+    }
+
+    if (this.h0mBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.h0mBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.h0m.flat()), this.gl.STATIC_DRAW);
+    }
 
     return true;
   }
 
   protected initializeUniformLocation(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
     super.initializeUniformLocation();
+
+    this.uniformLocationN = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_N_NAME);
+
     return true;
   }
 
   protected registerUniform(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
     super.registerUniform();
+
+    if (this.uniformLocationN) {
+      this.gl.uniform1i(this.uniformLocationN, this.N);
+    }
+
     return true;
   }
 
@@ -81,13 +116,15 @@ export class ShaderFFT extends Shader {
    * Calculate Phillips spectrum
    * @returns success or not
    */
-  protected calcurateSpectrum(): boolean {
-    const Lx = (this.lattice * 5) / 2;
-    const Ly = (this.lattice * 5) / 2;
+  protected calcurateH0(): boolean {
+    const Lx = (this.N * 5) / 2;
+    const Ly = (this.N * 5) / 2;
 
     function gauss(): number[] {
       const ret: number[] = [0.0, 0.0];
       ShaderUtility.generateGaussianRandom([Math.random(), Math.random()], ret);
+      // ret[0] = Math.abs(ret[0]);
+      // ret[1] = Math.abs(ret[1]);
       return ret;
     }
 
@@ -114,12 +151,10 @@ export class ShaderFFT extends Shader {
       return phillips;
     }
 
-    const h0: number[][] = [];
-
-    for (let y: number = 0; y < this.lattice; y++) {
-      for (let x = 0; x < this.lattice; x++) {
-        const kx: number = (-this.lattice / 2.0 + x) * ((2.0 * Math.PI) / Lx);
-        const ky: number = (-this.lattice / 2.0 + y) * ((2.0 * Math.PI) / Ly);
+    for (let y: number = 0; y < this.N; y++) {
+      for (let x = 0; x < this.N; x++) {
+        const kx: number = (-this.N / 2.0 + x) * ((2.0 * Math.PI) / Lx);
+        const ky: number = (-this.N / 2.0 + y) * ((2.0 * Math.PI) / Ly);
         let p: number = phillips(kx, ky);
         if (kx == 0.0 && ky == 0.0) {
           p = 0.0;
@@ -129,23 +164,33 @@ export class ShaderFFT extends Shader {
         const h0_i: number[] = [0.0, 0.0];
         h0_i[0] = (gaussRand[0] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
         h0_i[1] = (gaussRand[1] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
-        h0.push(h0_i);
+        this.h0.push(h0_i);
+        this.h0m.unshift(h0_i);
       }
     }
 
-    this.spectrum = h0;
+    return true;
+  }
+
+  /**
+   * Calculate vertex index array
+   * @returns success or not
+   */
+  protected calcurateVertexIndex(): boolean {
+    this.vertexIndex = new Array(this.N * this.N).fill(null).map((_, i) => i);
     return true;
   }
 
   public preUpdate(): void {
     super.preUpdate();
 
-    ShaderUtility.generateSubdividedMesh2d(this.size, this.lattice, this.vertexArray, this.colorArray, this.indexArray);
-    this.calcurateSpectrum();
+    ShaderUtility.generateSubdividedMesh2d(this.size, this.N, this.vertexArray, this.colorArray, this.indexArray);
+    this.calcurateH0();
+    this.calcurateVertexIndex();
   }
 
   public update(deltaTime: number) {
-    if (!this.glContext || deltaTime <= 0.0) {
+    if (!this.gl || deltaTime <= 0.0) {
       return;
     }
     super.update(deltaTime);

@@ -37,7 +37,7 @@ export class ShaderSyntesis extends Shader {
   ];
 
   protected initialize(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
@@ -52,30 +52,21 @@ export class ShaderSyntesis extends Shader {
   }
 
   protected initializeUniformLocation(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
 
     super.initializeUniformLocation();
 
-    this.uniformLocationTime = this.glContext.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
-    this.uniformLocationWaveNumber = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_NUMBER_NAME
-    );
-    this.uniformLocationWaveAmplitude = this.glContext.getUniformLocation(
+    this.uniformLocationTime = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
+    this.uniformLocationWaveNumber = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_NUMBER_NAME);
+    this.uniformLocationWaveAmplitude = this.gl.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
     );
-    this.uniformLocationWaveLength = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_LENGTH_NAME
-    );
-    this.unifromLocationWaveCycle = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_WAVE_CYCLE_NAME
-    );
-    this.uniformLocationWaveDirection = this.glContext.getUniformLocation(
+    this.uniformLocationWaveLength = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_LENGTH_NAME);
+    this.unifromLocationWaveCycle = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_CYCLE_NAME);
+    this.uniformLocationWaveDirection = this.gl.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_WAVE_DIRECTION_NAME
     );
@@ -84,29 +75,29 @@ export class ShaderSyntesis extends Shader {
   }
 
   protected registerUniform(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
 
     super.registerUniform();
 
     if (this.uniformLocationTime) {
-      this.glContext.uniform1f(this.uniformLocationTime, this.time);
+      this.gl.uniform1f(this.uniformLocationTime, this.time);
     }
     if (this.uniformLocationWaveNumber) {
-      this.glContext.uniform1i(this.uniformLocationWaveNumber, this.waveNumber);
+      this.gl.uniform1i(this.uniformLocationWaveNumber, this.waveNumber);
     }
     if (this.uniformLocationWaveAmplitude) {
-      this.glContext.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
+      this.gl.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
     }
     if (this.uniformLocationWaveLength) {
-      this.glContext.uniform1fv(this.uniformLocationWaveLength, this.length);
+      this.gl.uniform1fv(this.uniformLocationWaveLength, this.length);
     }
     if (this.unifromLocationWaveCycle) {
-      this.glContext.uniform1fv(this.unifromLocationWaveCycle, this.cycle);
+      this.gl.uniform1fv(this.unifromLocationWaveCycle, this.cycle);
     }
     if (this.uniformLocationWaveDirection) {
-      this.glContext.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
+      this.gl.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
     }
 
     return true;
@@ -124,7 +115,7 @@ export class ShaderSyntesis extends Shader {
   }
 
   public update(deltaTime: number) {
-    if (!this.glContext || deltaTime <= 0.0) {
+    if (!this.gl || deltaTime <= 0.0) {
       return;
     }
 

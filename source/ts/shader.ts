@@ -9,12 +9,12 @@ export class Shader {
    * @constructor
    */
   constructor(canvas: HTMLCanvasElement) {
-    this.glContext = canvas.getContext('webgl2');
+    this.gl = canvas.getContext('webgl2');
     this.initialize();
   }
 
   /** webgl2.0 context this canvas */
-  protected glContext: WebGLRenderingContext | null = null;
+  protected gl: WebGL2RenderingContext | null = null;
   /** a using current vertex shader source code */
   protected vertexShaderSource: string = ShaderUtility.VERTEX_SHADER_UNRIT_SOURCE;
   /** a using current fragment shader source code */
@@ -60,7 +60,7 @@ export class Shader {
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
   /** view position a.k.a camera position */
-  public viewPosition: glm.vec3 = [1, 2, 5.0];
+  public viewPosition: glm.vec3 = [-1, -2, 5.0];
   /** the position camera look at */
   public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
   /** basis upvector , basically [0, 1, 0] or [0, 0, 0] and it depends on industry */
@@ -88,7 +88,7 @@ export class Shader {
    * Initializer function which would called in constructor
    */
   protected initialize(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
@@ -104,29 +104,26 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeShaderProgram(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
     // init bg
-    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     // create shader
-    const vertexShader: WebGLShader | null = ShaderUtility.createVertexShader(this.glContext, this.vertexShaderSource);
-    const fragmentShader: WebGLShader | null = ShaderUtility.createFragmentShader(
-      this.glContext,
-      this.fragmentShaderSource
-    );
+    const vertexShader: WebGLShader | null = ShaderUtility.createVertexShader(this.gl, this.vertexShaderSource);
+    const fragmentShader: WebGLShader | null = ShaderUtility.createFragmentShader(this.gl, this.fragmentShaderSource);
 
     // create program
     if (vertexShader && fragmentShader) {
-      this.program = ShaderUtility.createProgram(this.glContext, vertexShader, fragmentShader);
-      this.glContext.useProgram(this.program);
+      this.program = ShaderUtility.createProgram(this.gl, vertexShader, fragmentShader);
+      this.gl.useProgram(this.program);
 
       if (this.program) {
-        this.attribLocationVertex = this.glContext.getAttribLocation(this.program, 'in_VertexPosition');
-        this.attribLocationColor = this.glContext.getAttribLocation(this.program, 'in_Color');
+        this.attribLocationVertex = this.gl.getAttribLocation(this.program, 'in_VertexPosition');
+        this.attribLocationColor = this.gl.getAttribLocation(this.program, 'in_Color');
       }
     }
     return true;
@@ -137,35 +134,21 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeAttribute(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
-    this.vertexBuffer = this.glContext.createBuffer();
-    this.colorBuffer = this.glContext.createBuffer();
-    this.indexBuffer = this.glContext.createBuffer();
+    this.vertexBuffer = this.gl.createBuffer();
+    this.colorBuffer = this.gl.createBuffer();
+    this.indexBuffer = this.gl.createBuffer();
 
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-    this.glContext.enableVertexAttribArray(this.attribLocationVertex);
-    this.glContext.vertexAttribPointer(
-      this.attribLocationVertex,
-      ShaderUtility.VERTEX_SIZE,
-      this.glContext.FLOAT,
-      false,
-      0,
-      0
-    );
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+    this.gl.enableVertexAttribArray(this.attribLocationVertex);
+    this.gl.vertexAttribPointer(this.attribLocationVertex, ShaderUtility.VERTEX_SIZE, this.gl.FLOAT, false, 0, 0);
 
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.colorBuffer);
-    this.glContext.enableVertexAttribArray(this.attribLocationColor);
-    this.glContext.vertexAttribPointer(
-      this.attribLocationColor,
-      ShaderUtility.COLOR_SIZE,
-      this.glContext.FLOAT,
-      false,
-      0,
-      0
-    );
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+    this.gl.enableVertexAttribArray(this.attribLocationColor);
+    this.gl.vertexAttribPointer(this.attribLocationColor, ShaderUtility.COLOR_SIZE, this.gl.FLOAT, false, 0, 0);
 
     return true;
   }
@@ -175,30 +158,24 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected registerAttribute(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-    this.glContext.bufferData(
-      this.glContext.ARRAY_BUFFER,
-      new Float32Array(this.vertexArray.flat()),
-      this.glContext.STATIC_DRAW
-    );
+    if (this.vertexBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.vertexArray.flat()), this.gl.STATIC_DRAW);
+    }
 
-    this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.colorBuffer);
-    this.glContext.bufferData(
-      this.glContext.ARRAY_BUFFER,
-      new Float32Array(this.colorArray.flat()),
-      this.glContext.STATIC_DRAW
-    );
+    if (this.colorBuffer) {
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+      this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.colorArray.flat()), this.gl.STATIC_DRAW);
+    }
 
-    this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    this.glContext.bufferData(
-      this.glContext.ELEMENT_ARRAY_BUFFER,
-      new Int16Array(this.indexArray.flat()),
-      this.glContext.STATIC_DRAW
-    );
+    if (this.indexBuffer) {
+      this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Int16Array(this.indexArray.flat()), this.gl.STATIC_DRAW);
+    }
 
     return true;
   }
@@ -208,23 +185,17 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeUniformLocation(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
 
-    this.uniformLocationModelMatrix = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_MODEL_MATRIX_NAME
-    );
-    this.uniformLocationViewMatrix = this.glContext.getUniformLocation(
-      this.program,
-      ShaderUtility.UNIFORM_VIEW_MATRIX_NAME
-    );
-    this.uniformLocationProjectionMatrix = this.glContext.getUniformLocation(
+    this.uniformLocationModelMatrix = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_MODEL_MATRIX_NAME);
+    this.uniformLocationViewMatrix = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_VIEW_MATRIX_NAME);
+    this.uniformLocationProjectionMatrix = this.gl.getUniformLocation(
       this.program,
       ShaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
     );
-    this.uniformLocationTime = this.glContext.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
+    this.uniformLocationTime = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
     return true;
   }
 
@@ -233,21 +204,21 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected registerUniform(): boolean {
-    if (!this.glContext || !this.program) {
+    if (!this.gl || !this.program) {
       return false;
     }
 
     if (this.uniformLocationModelMatrix) {
-      this.glContext.uniformMatrix4fv(this.uniformLocationModelMatrix, false, this.modelMatrix);
+      this.gl.uniformMatrix4fv(this.uniformLocationModelMatrix, false, this.modelMatrix);
     }
     if (this.uniformLocationViewMatrix) {
-      this.glContext.uniformMatrix4fv(this.uniformLocationViewMatrix, false, this.viewMatrix);
+      this.gl.uniformMatrix4fv(this.uniformLocationViewMatrix, false, this.viewMatrix);
     }
     if (this.uniformLocationProjectionMatrix) {
-      this.glContext.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
+      this.gl.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
     }
     if (this.uniformLocationTime) {
-      this.glContext.uniform1f(this.uniformLocationTime, this.time);
+      this.gl.uniform1f(this.uniformLocationTime, this.time);
     }
 
     return true;
@@ -258,17 +229,17 @@ export class Shader {
    * @returns {boolean} success or not
    */
   protected draw(): boolean {
-    if (!this.glContext) {
+    if (!this.gl) {
       return false;
     }
 
     const INDEX_LENGTH: number = this.indexArray.flat().length;
     if (this.drawType == 0) {
-      this.glContext.drawElements(this.glContext.TRIANGLES, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+      this.gl.drawElements(this.gl.TRIANGLES, INDEX_LENGTH, this.gl.UNSIGNED_SHORT, 0);
     } else {
-      this.glContext.drawElements(this.glContext.LINE_STRIP, INDEX_LENGTH, this.glContext.UNSIGNED_SHORT, 0);
+      this.gl.drawElements(this.gl.LINE_STRIP, INDEX_LENGTH, this.gl.UNSIGNED_SHORT, 0);
     }
-    this.glContext.flush();
+    this.gl.flush();
     return true;
   }
 
@@ -347,12 +318,12 @@ export class Shader {
    * @param {number} deltaTime duration time between current and prev frame
    */
   public update(deltaTime: number) {
-    if (!this.glContext || deltaTime <= 0.0) {
+    if (!this.gl || deltaTime <= 0.0) {
       return;
     }
 
-    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.time += deltaTime;
     this.calculateMvpMatrices();

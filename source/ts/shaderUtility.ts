@@ -2,6 +2,7 @@ import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
 import VERTEX_SHADER_SYNTHESIS from '@shader/synthesis_wave.vert';
 import VERTEX_SHADER_FFT from '@shader/fft_wave.vert';
+import FRAGMENT_SHADER_FFT from '@shader/fft_wave.frag';
 
 /**
  * OpenGL shader util export functions and parameters
@@ -12,8 +13,10 @@ export const VERTEX_SHADER_UNRIT_SOURCE = VERTEX_SHADER_UNRIT;
 export const FRAGMENT_SHADER_UNRIT_SOURCE = FRAGMENT_SHADER_UNRIT;
 /** a gaussian wave shader raw source code */
 export const VERTEX_SHADER_SYNTHESIS_SOURCE = VERTEX_SHADER_SYNTHESIS;
-/** a fft wave shader raw source code */
+/** a vertex fft wave shader raw source code */
 export const VERTEX_SHADER_FFT_SOURCE = VERTEX_SHADER_FFT;
+/** a fragment fft wave shader raw source code */
+export const FRAGMENT_SHADER_FFT_SOURCE = FRAGMENT_SHADER_FFT;
 
 /** difinition of vertex dimension size */
 export const VERTEX_SIZE: number = 3;
@@ -41,8 +44,10 @@ export const UNIFORM_WAVE_CYCLE_NAME: string = 'u_Cycle';
 export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
 /** uniform name of wave frequency in shader program */
 export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
+/** uniform name of lattice number in shade program */
+export const UNIFORM_N_NAME: string = 'u_N';
 /** uniform name of initial spectrum in shade program */
-export const UNIFORM_SPECTRUM_NAME: string = 'u_Spectrum';
+export const UNIFORM_H0_NAME: string = 'u_H0';
 
 /**
  * compile vertex shader and get shader object
