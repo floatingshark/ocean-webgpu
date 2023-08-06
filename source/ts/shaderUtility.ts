@@ -46,8 +46,12 @@ export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
 export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
 /** uniform name of lattice number in shade program */
 export const UNIFORM_N_NAME: string = 'u_N';
-/** uniform name of initial spectrum in shade program */
-export const UNIFORM_H0_NAME: string = 'u_H0';
+/** uniform name of amplitude in shade program */
+export const UNIFORM_A_NAME: string = 'u_A';
+/** uniform name of initial spectrum texture in shade program */
+export const UNIFORM_H0_NAME: string = 'u_texH0';
+/** uniform name of mirrored initial spectrum texture in shade program */
+export const UNIFORM_H0M_NAME: string = 'u_texH0m';
 
 /**
  * compile vertex shader and get shader object

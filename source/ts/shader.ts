@@ -94,7 +94,7 @@ export class Shader {
 
     this.initializeShaderProgram();
     this.initializeAttribute();
-    this.initializeUniformLocation();
+    this.initializeUniform();
 
     return true;
   }
@@ -184,7 +184,7 @@ export class Shader {
    * Setup shader uniform variables
    * @returns {boolean} setup is success or not
    */
-  protected initializeUniformLocation(): boolean {
+  protected initializeUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }

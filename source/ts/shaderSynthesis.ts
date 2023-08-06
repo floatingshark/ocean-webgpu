@@ -51,12 +51,12 @@ export class ShaderSyntesis extends Shader {
     return true;
   }
 
-  protected initializeUniformLocation(): boolean {
+  protected initializeUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }
 
-    super.initializeUniformLocation();
+    super.initializeUniform();
 
     this.uniformLocationTime = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
     this.uniformLocationWaveNumber = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_NUMBER_NAME);
