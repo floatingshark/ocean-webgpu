@@ -41,6 +41,15 @@ export class ShaderFFT extends Shader {
   protected textureH0Re: WebGLTexture | null = null;
   protected textureH0Im: WebGLTexture | null = null;
 
+  private UNIFORM_N_NAME: string = 'u_N';
+  private UNIFORM_A_NAME: string = 'u_A';
+  private UNIFORM_T_NAME: string = 'u_T';
+  private UNIFORM_F_NAME: string = 'u_f';
+  private UNIFORM_PHI_NAME: string = 'u_Phi';
+  private UNIFORM_H0_NAME: string = 'u_texH0';
+  private UNIFORM_H0_REAL_NAME: string = 'u_texH0Re';
+  private UNIFORM_H0_IMAGINARY_NAME: string = 'u_texH0Im';
+
   // derived from Shader.ts
   override initialize(): boolean {
     if (!this.gl) {
@@ -89,13 +98,13 @@ export class ShaderFFT extends Shader {
     }
     super.initializeUniform();
 
-    this.uniformLocationN = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_N_NAME);
-    this.uniformLocationA = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_A_NAME);
-    this.uniformLocationT = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_T_NAME);
-    this.uniformLocationF = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_F_NAME);
-    this.uniformLocationPhi = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_PHI_NAME);
-    this.uniformLocationTexH0Re = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_REAL_NAME);
-    this.uniformLocationTexH0Im = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_H0_IMAGINARY_NAME);
+    this.uniformLocationN = this.gl.getUniformLocation(this.program, this.UNIFORM_N_NAME);
+    this.uniformLocationA = this.gl.getUniformLocation(this.program, this.UNIFORM_A_NAME);
+    this.uniformLocationT = this.gl.getUniformLocation(this.program, this.UNIFORM_T_NAME);
+    this.uniformLocationF = this.gl.getUniformLocation(this.program, this.UNIFORM_F_NAME);
+    this.uniformLocationPhi = this.gl.getUniformLocation(this.program, this.UNIFORM_PHI_NAME);
+    this.uniformLocationTexH0Re = this.gl.getUniformLocation(this.program, this.UNIFORM_H0_REAL_NAME);
+    this.uniformLocationTexH0Im = this.gl.getUniformLocation(this.program, this.UNIFORM_H0_IMAGINARY_NAME);
 
     this.textureH0Re = this.gl.createTexture();
     this.textureH0Im = this.gl.createTexture();

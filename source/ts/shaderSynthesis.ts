@@ -31,6 +31,13 @@ export class ShaderSyntesis extends Shader {
     [-0.2, 0.4],
   ];
 
+  private UNIFORM_WAVE_NUMBER_NAME: string = 'u_WaveNumber';
+  private UNIFORM_WAVE_AMPLITUDE_NAME: string = 'u_Amplitude';
+  private UNIFORM_WAVE_LENGTH_NAME: string = 'u_Length';
+  private UNIFORM_WAVE_CYCLE_NAME: string = 'u_Cycle';
+  private UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
+  private UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
+
   // derived from Shader.ts
   override initialize(): boolean {
     if (!this.gl) {
@@ -48,17 +55,16 @@ export class ShaderSyntesis extends Shader {
 
     super.initializeUniform();
 
-    this.uniformLocationTime = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
-    this.uniformLocationWaveNumber = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_NUMBER_NAME);
+    this.uniformLocationWaveNumber = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_NUMBER_NAME);
     this.uniformLocationWaveAmplitude = this.gl.getUniformLocation(
       this.program,
-      ShaderUtility.UNIFORM_WAVE_AMPLITUDE_NAME
+      this.UNIFORM_WAVE_AMPLITUDE_NAME
     );
-    this.uniformLocationWaveLength = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_LENGTH_NAME);
-    this.unifromLocationWaveCycle = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_WAVE_CYCLE_NAME);
+    this.uniformLocationWaveLength = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_LENGTH_NAME);
+    this.unifromLocationWaveCycle = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_CYCLE_NAME);
     this.uniformLocationWaveDirection = this.gl.getUniformLocation(
       this.program,
-      ShaderUtility.UNIFORM_WAVE_DIRECTION_NAME
+      this.UNIFORM_WAVE_DIRECTION_NAME
     );
 
     return true;

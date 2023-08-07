@@ -81,6 +81,15 @@ export class Shader {
   /** Current animation count [ms] */
   protected time: number = 0.0;
 
+  /** uniform name of model matrix in shader program */
+  private UNIFORM_MODEL_MATRIX_NAME: string = 'u_ModelMatrix';
+  /** uniform name of view matrix in shader program */
+  private UNIFORM_VIEW_MATRIX_NAME: string = 'u_ViewMatrix';
+  /** uniform name of projection matrix in shader program */
+  private UNIFORM_PROJECTION_MATRIX_NAME: string = 'u_ProjectionMatrix';
+  /** uniform name of time value in shader program */
+  private UNIFORM_TIME_NAME: string = 'u_Time';
+
   /**
    * Initializer function which would called in constructor
    */
@@ -131,11 +140,11 @@ export class Shader {
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.enableVertexAttribArray(attribLocationVertex);
-    this.gl.vertexAttribPointer(attribLocationVertex, ShaderUtility.VERTEX_SIZE, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(attribLocationVertex, 3, this.gl.FLOAT, false, 0, 0);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
     this.gl.enableVertexAttribArray(attribLocationColor);
-    this.gl.vertexAttribPointer(attribLocationColor, ShaderUtility.COLOR_SIZE, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(attribLocationColor, 4, this.gl.FLOAT, false, 0, 0);
 
     return true;
   }
@@ -174,13 +183,13 @@ export class Shader {
       return false;
     }
 
-    this.uniformLocationModelMatrix = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_MODEL_MATRIX_NAME);
-    this.uniformLocationViewMatrix = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_VIEW_MATRIX_NAME);
+    this.uniformLocationModelMatrix = this.gl.getUniformLocation(this.program, this.UNIFORM_MODEL_MATRIX_NAME);
+    this.uniformLocationViewMatrix = this.gl.getUniformLocation(this.program, this.UNIFORM_VIEW_MATRIX_NAME);
     this.uniformLocationProjectionMatrix = this.gl.getUniformLocation(
       this.program,
-      ShaderUtility.UNIFORM_PROJECTION_MATRIX_NAME
+      this.UNIFORM_PROJECTION_MATRIX_NAME
     );
-    this.uniformLocationTime = this.gl.getUniformLocation(this.program, ShaderUtility.UNIFORM_TIME_NAME);
+    this.uniformLocationTime = this.gl.getUniformLocation(this.program, this.UNIFORM_TIME_NAME);
     return true;
   }
 

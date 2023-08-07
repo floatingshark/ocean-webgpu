@@ -1,55 +1,12 @@
 /**
- * Utility - constant values / calculation snippets
+ * Utilities - calculation snippets mainly
  */
 
-/** difinition of vertex dimension size */
-export const VERTEX_SIZE: number = 3;
-/** difinition of color dimension size */
-export const COLOR_SIZE: number = 4;
-/** difinition of spectrum dimension size */
-export const SPECTRUM_SIZE: number = 1;
-/** uniform name of model matrix in shader program */
-export const UNIFORM_MODEL_MATRIX_NAME: string = 'u_ModelMatrix';
-/** uniform name of view matrix in shader program */
-export const UNIFORM_VIEW_MATRIX_NAME: string = 'u_ViewMatrix';
-/** uniform name of projection matrix in shader program */
-export const UNIFORM_PROJECTION_MATRIX_NAME: string = 'u_ProjectionMatrix';
-/** uniform name of time value in shader program */
-export const UNIFORM_TIME_NAME: string = 'u_Time';
-/** uniform name of wave number in shader program */
-export const UNIFORM_WAVE_NUMBER_NAME: string = 'u_WaveNumber';
-/** uniform name of wave amplitude in shader program */
-export const UNIFORM_WAVE_AMPLITUDE_NAME: string = 'u_Amplitude';
-/** uniform name of wave length in shader program */
-export const UNIFORM_WAVE_LENGTH_NAME: string = 'u_Length';
-/** uniform name of wave speed in shader program */
-export const UNIFORM_WAVE_CYCLE_NAME: string = 'u_Cycle';
-/** uniform name of wave direction in shader program */
-export const UNIFORM_WAVE_DIRECTION_NAME: string = 'u_Direction';
-/** uniform name of wave frequency in shader program */
-export const UNIFORM_WAVE_FREQUENCY_NAME: string = 'u_Frequency';
-/** uniform name of lattice number in shade program */
-export const UNIFORM_N_NAME: string = 'u_N';
-/** uniform name of amplitude in shade program */
-export const UNIFORM_A_NAME: string = 'u_A';
-/** uniform name of cycle period in shade program */
-export const UNIFORM_T_NAME: string = 'u_T';
-/** uniform name of frequency in shade program */
-export const UNIFORM_F_NAME: string = 'u_f';
-/** uniform name of initial phase in shade program */
-export const UNIFORM_PHI_NAME: string = 'u_Phi';
-/** uniform name of initial spectrum texture in shade program */
-export const UNIFORM_H0_NAME: string = 'u_texH0';
-/** uniform name of initial spectrum real part encoded rgba texture in shade program */
-export const UNIFORM_H0_REAL_NAME: string = 'u_texH0Re';
-/** uniform name of initial spectrum imaginary part encoded rgba texture in shade program */
-export const UNIFORM_H0_IMAGINARY_NAME: string = 'u_texH0Im';
-
 /**
- * compile vertex shader and get shader object
- * @param {WebGLRenderingContext} glContext webGL context in target canvas
- * @param {string} source vertex shader source string
- * @returns {WebGLShader | null} a compiled shader object or null
+ * Compile vertex shader and return shader object
+ * @param {WebGLRenderingContext} glContext Webgl2 context
+ * @param {string} source Vertex shader source code as string
+ * @returns {WebGLShader | null} Out vertex shader object
  */
 export function createVertexShader(glContext: WebGLRenderingContext, source: string): WebGLShader | null {
   const vertexShader: WebGLShader | null = glContext.createShader(glContext.VERTEX_SHADER);
@@ -66,10 +23,10 @@ export function createVertexShader(glContext: WebGLRenderingContext, source: str
 }
 
 /**
- * compile fragment shader and get shader object
- * @param {WebGLRenderingContext} glContext webGL context in target canvas
- * @param {string} source fragment shader source string
- * @returns {WebGLShader | null} a compiled shader object or null
+ * Compile fragment shader and return shader object
+ * @param {WebGLRenderingContext} glContext Webgl2 context
+ * @param {string} source Fragment shader source code as string
+ * @returns {WebGLShader | null} Out fragment shader object
  */
 export function createFragmentShader(glContext: WebGLRenderingContext, source: string): WebGLShader | null {
   const fragmentShader: WebGLShader | null = glContext.createShader(glContext.FRAGMENT_SHADER);
@@ -86,11 +43,11 @@ export function createFragmentShader(glContext: WebGLRenderingContext, source: s
 }
 
 /**
- * merge vertex and fragment shader and get shade program
- * @param {WebGLRenderingContext} glContext webGL context in target canvas
- * @param {WebGLShader} vertex vertex shader object
- * @param {WebGLShader} fragment fragment shader object
- * @returns {WegGLProgram | null} a webGL shader program or null
+ * Merge vertex and fragment shaders and return shader program
+ * @param {WebGLRenderingContext} glContext Webgl2 context
+ * @param {WebGLShader} vertex Certex shader object
+ * @param {WebGLShader} fragment Fragment shader object
+ * @returns {WegGLProgram | null} Out shader program
  */
 export function createProgram(
   glContext: WebGLRenderingContext,
@@ -112,12 +69,12 @@ export function createProgram(
 }
 
 /**
- * create plane mesh like a graph paper
- * @param {number} size generated plane mesh size, last position is [size, size];
- * @param {number} division number of division
- * @param {number[]} vertice out vertex array for attribute buffer
- * @param {number[]} colors out color array for attribute buffer
- * @param {number[]} indice [caution] out index array is a bit weird for line draw
+ * Create plane mesh with subdiveded polygones like a graph paper
+ * @param {number} size Target size, the mesh last index position is [size, size];
+ * @param {number} division Number of division
+ * @param {number[]} vertice Out vertex array for attribute buffer
+ * @param {number[]} colors Out vertex color array for attribute buffer
+ * @param {number[]} indice Out index array [Caution!] Have bit weird indices for line drawing
  */
 export function generateSubdividedMesh2d(
   size: number,
@@ -158,10 +115,9 @@ export function generateSubdividedMesh2d(
 }
 
 /**
- * create gaussian random by Box–Muller's method
- * @param {number[]} seed two uniform random numbers for gaussian random generator
- * @param {number} out1 result 1
- * @param {number} out2 result 2
+ * Create gaussian random numbers by Box–Muller's method
+ * @param {number[]} seed Two uniform random numbers
+ * @param {number[]} out Out two random values
  */
 export function generateGaussianRandom(seed: number[], out: number[]) {
   if (seed.length > 1 && out.length > 0) {
@@ -179,7 +135,7 @@ export function generateGaussianRandom(seed: number[], out: number[]) {
 /**
  * 32 bit float to rgba [0, 255] 8bit * 4 values
  * @param inFloat A float value for encoding
- * @returns AN Endoced rgba value
+ * @returns Out endoced rgba value
  */
 export function encodeFloatToRGBA(inFloat: number): number[] {
   const v1: number = inFloat * 255.0;
