@@ -153,10 +153,6 @@ export class ShaderFFT extends Shader {
     return true;
   }
 
-  /**
-   * Calculate Phillips spectrum
-   * @returns success or not
-   */
   protected calcurateH0(): boolean {
     const Lx = (this.N * 5) / 2;
     const Ly = (this.N * 5) / 2;
@@ -224,10 +220,6 @@ export class ShaderFFT extends Shader {
     return true;
   }
 
-  /**
-   * Calculate vertex index array
-   * @returns success or not
-   */
   protected calcurateVertexIndex(): boolean {
     this.vertexIndex = new Array(this.N * this.N).fill(null).map((_, i) => i);
     return true;

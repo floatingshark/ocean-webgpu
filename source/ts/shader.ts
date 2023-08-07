@@ -4,7 +4,7 @@ import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
 import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
 
 /**
- * WebGL basis shader class
+ * Webgl2 basis shader class
  */
 export class Shader {
   /**
@@ -15,70 +15,70 @@ export class Shader {
     this.initialize();
   }
 
-  /** webgl2.0 context this canvas */
+  /** Webgl2.0 context in this canvas */
   protected gl: WebGL2RenderingContext | null = null;
-  /** a using current vertex shader source code */
+  /** Current vertex shader source */
   protected vertexShaderSource: string = VERTEX_SHADER_UNRIT;
-  /** a using current fragment shader source code */
+  /** Current fragment shader source */
   protected fragmentShaderSource: string = FRAGMENT_SHADER_UNRIT;
-  /** current shader program */
+  /** Current shader program */
   protected program: WebGLProgram | null = null;
-  /** current shader draw type */
+  /** Current shader draw type [TRIANGLES, LINES] */
   protected drawType: number = 0;
 
-  /** attribute buffer of vertices */
+  /** Attribute buffer of vertices */
   protected vertexBuffer: WebGLBuffer | null = null;
-  /** attribute buffer of vertex colors */
+  /** Attribute buffer of vertex colors */
   protected colorBuffer: WebGLBuffer | null = null;
-  /** index element buffer */
+  /** Index element buffer */
   protected indexBuffer: WebGLBuffer | null = null;
 
-  /** a vertex 2D array for attribute vertex buffer */
+  /** A vertex 2D array for attribute buffer */
   protected vertexArray: number[][] = ShaderUtility.MESH_2D_VERTICE;
-  /** a color 2D array for attribute color buffer */
+  /** A vertex color 2D array for attribute buffer */
   protected colorArray: number[][] = ShaderUtility.MESH_2D_COLOR;
-  /** a index 2D array for index element buffer */
+  /** A index 2D array for index buffer */
   protected indexArray: number[][] = ShaderUtility.MESH_2D_INDEX;
 
-  /** uniform location of model matrix */
+  /** Model matrix uniform location */
   protected uniformLocationModelMatrix: WebGLUniformLocation | null = null;
-  /** uniform location of view matrix */
+  /** View matrix uniform location */
   protected uniformLocationViewMatrix: WebGLUniformLocation | null = null;
-  /** uniform location of projection matrix */
+  /** Projection matrix uniform location */
   protected uniformLocationProjectionMatrix: WebGLUniformLocation | null = null;
 
-  /** model position */
+  /** Model position for model matrix */
   protected position: glm.vec3 = [0.0, 0.0, 0.0];
-  /** model rotation */
+  /** Model rotation for model matrix */
   protected rotation: glm.vec3 = [0.0, 0.0, 0.0];
-  /** model scale */
+  /** Model scale for model matrix */
   protected scale: glm.vec3 = [1.0, 1.0, 1.0];
   /** 4x4 model matrix */
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
-  /** view position a.k.a camera position */
+  /** View position / Camera position */
   public viewPosition: glm.vec3 = [-1, -2, 0.3];
-  /** the position camera look at */
+  /** Look at position */
   public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
-  /** basis upvector , basically [0, 1, 0] or [0, 0, 0] and it depends on industry */
+  /** Basis upvector, basically [0, 1, 0] or [0, 0, 0] and it depends on emvironments */
   public viewUp: glm.vec3 = [0.0, 0.0, 1.0];
   /** 4x4 view matrix */
   protected viewMatrix: glm.mat4 = glm.mat4.create();
 
-  /** camera FOV - field of range */
+  /** FOV - field of range */
   protected projectionFovy: number = glm.glMatrix.toRadian(60.0);
-  /** camera aspect ratio - (width / height) */
+  /** Aspect ratio - (width / height) */
   protected projectionAspect: number = 1.0;
-  /** near bounds of camera */
+  /** Near bounds of camera */
   protected projectionNear: number = 0;
-  /** far bounds of camera */
+  /** Far bounds of camera */
   protected projectionFar: number = 10000;
   /** 4x4 projection matrix */
   protected projectionMatrix: glm.mat4 = glm.mat4.create();
 
-  /** uniform location of time value */
+  /** Time count uniform location */
   protected uniformLocationTime: WebGLUniformLocation | null = null;
-  /** current animation time */
+  /** Current animation count [ms] */
   protected time: number = 0.0;
 
   /**
@@ -95,8 +95,7 @@ export class Shader {
   }
 
   /**
-   * Setup shader program
-   * @returns {boolean} setup is success or not
+   * Create shader program from vertex and fragment source file
    */
   protected initializeShaderProgram(): boolean {
     if (!this.gl) {
@@ -116,8 +115,7 @@ export class Shader {
   }
 
   /**
-   * Setup shader attribute variables
-   * @returns {boolean} setup is success or not
+   * Create attribute buffer and get attribute location
    */
   protected initializeAttribute(): boolean {
     if (!this.gl || !this.program) {
@@ -143,8 +141,7 @@ export class Shader {
   }
 
   /**
-   * Register shader values to attribute buffers
-   * @returns {boolean} setup is success or not
+   * Register values to attribute buffers
    */
   protected registerAttribute(): boolean {
     if (!this.gl) {
@@ -170,8 +167,7 @@ export class Shader {
   }
 
   /**
-   * Setup shader uniform variables
-   * @returns {boolean} setup is success or not
+   * Get uniform locations
    */
   protected initializeUniform(): boolean {
     if (!this.gl || !this.program) {
@@ -189,8 +185,7 @@ export class Shader {
   }
 
   /**
-   * Register shader values to uniform variables
-   * @returns {boolean} setup is success or not
+   * Register values to uniform variables
    */
   protected registerUniform(): boolean {
     if (!this.gl || !this.program) {
@@ -217,8 +212,7 @@ export class Shader {
   }
 
   /**
-   * Rendering current shader context
-   * @returns {boolean} success or not
+   * Draw elements using this.drayType
    */
   protected draw(): boolean {
     if (!this.gl) {
@@ -236,8 +230,7 @@ export class Shader {
   }
 
   /**
-   * Calc model, view, and projection matrices
-   * @returns {boolean} calculated successfully or not
+   * Calculate model, view, and projection matrices
    */
   protected calculateMvpMatrices(): boolean {
     const translateMatrix: glm.mat4 = glm.mat4.translate(glm.mat4.create(), glm.mat4.create(), [
@@ -294,7 +287,7 @@ export class Shader {
   }
 
   /**
-   * The function which executed befor update loop
+   * This function will be executed once before update loop
    */
   public preUpdate(): void {
     this.registerAttribute();
@@ -303,7 +296,7 @@ export class Shader {
   }
 
   /**
-   * Update loop function for canvas animation
+   * This function will be executed on every frame
    * @param {number} deltaTime duration time between current and prev frame
    */
   public update(deltaTime: number) {

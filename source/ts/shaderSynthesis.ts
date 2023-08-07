@@ -13,28 +13,17 @@ export class ShaderSyntesis extends Shader {
   protected override fragmentShaderSource: string = FRAGMENT_SHADER_UNRIT;
   protected override drawType: number = 1;
 
-  /** uniform location of time value */
   protected uniformLocationTime: WebGLUniformLocation | null = null;
-  /** uniform location of wave number */
   protected uniformLocationWaveNumber: WebGLUniformLocation | null = null;
-  /** uniform location of wave amplitude[A] */
   protected uniformLocationWaveAmplitude: WebGLUniformLocation | null = null;
-  /** uniform location of wave length[λ] */
   protected uniformLocationWaveLength: WebGLUniformLocation | null = null;
-  /** uniform location of wave speed[S] */
   protected unifromLocationWaveCycle: WebGLUniformLocation | null = null;
-  /** uniform location of wave direction[D] */
   protected uniformLocationWaveDirection: WebGLUniformLocation | null = null;
 
-  /** wave number >= 1 and integer */
   protected waveNumber: number = 4;
-  /** each wave max height */
   protected amplitude: number[] = [0.3, 0.2, 0.3, 0.05];
-  /** each wave length */
   protected length: number[] = [4.0, 4.2, 3.5, 3.1];
-  /** each wave cycle - being different is better */
   protected cycle: number[] = [3200, 2700, 3500, 1000];
-  /** each wave direction being different is better */
   protected direction: number[][] = [
     [0.5, 0.7],
     [-0.6, -0.2],
@@ -110,9 +99,6 @@ export class ShaderSyntesis extends Shader {
     return true;
   }
 
-  /** Calc wave contexts - amplitude, speed, direction, frequency
-   * @returns {boolean} calced successfully or not
-   */
   protected calculateWaveContext(): boolean {
     this.amplitude.length = this.waveNumber;
     this.length.length = this.waveNumber;

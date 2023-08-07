@@ -7,7 +7,8 @@
     "build": "webpack",
     "serve": "webpack serve",
     "lint": "eslint ./source/**/*.ts",
-    "format": "prettier --write 'source/**/*.{html,css,js,ts,json,md}'"
+    "format": "prettier --write 'source/**/*.{html,css,js,ts,json,md}'",
+    "doc": "typedoc --entryPointStrategy expand --sort source-order ./source"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "style-loader": "^3.3.2",
     "ts-loader": "^9.4.2",
     "ts-shader-loader": "^2.0.2",
+    "typedoc": "^0.24.8",
     "typescript": "^5.0.3",
     "webpack": "^5.78.0",
     "webpack-cli": "^5.0.1",
