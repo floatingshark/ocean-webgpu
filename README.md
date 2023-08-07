@@ -1,4 +1,5 @@
 # Water surface on webGL [wateri]
+[![ESLint](https://github.com/samenachan/wateri/actions/workflows/eslint.yml/badge.svg?branch=main)](https://github.com/samenachan/wateri/actions/workflows/eslint.yml)  
 Some simple shaders written in **TypeScript** and **WebGL2.0** for rendering water surface.  
 Check out this [page](https://samenachan.github.io/wateri/public/) to see computer graphic's water surfaces on web.
 
