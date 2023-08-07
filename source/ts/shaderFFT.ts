@@ -66,7 +66,7 @@ export class ShaderFFT extends Shader {
     }
     super.initializeAttribute();
 
-    const attribLocationVertexIndex: number = this.gl.getAttribLocation(this.program, 'in_VertexIndex');
+    const attribLocationVertexIndex: number = 2;
 
     this.vertexIndexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexIndexBuffer);

@@ -131,8 +131,8 @@ export class Shader {
       return false;
     }
 
-    const attribLocationVertex: number = this.gl.getAttribLocation(this.program, 'in_VertexPosition');
-    const attribLocationColor: number = this.gl.getAttribLocation(this.program, 'in_Color');
+    const attribLocationVertex: number = 0;
+    const attribLocationColor: number = 1;
 
     this.vertexBuffer = this.gl.createBuffer();
     this.colorBuffer = this.gl.createBuffer();
