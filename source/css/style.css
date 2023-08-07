@@ -1,13 +1,14 @@
 body {
   background-color: ghostwhite;
-  font-family: monospace;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .title {
   text-align: center;
-  font-size: larger;
-  padding-top: 50px;
-  padding-bottom: 50px;
+  font-size: 2.5em;
+  /*font-weight: bold;*/
+  padding-top: 1em;
+  padding-bottom: 0.5em;
 }
 
 .canvas-container {

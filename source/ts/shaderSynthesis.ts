@@ -56,16 +56,10 @@ export class ShaderSyntesis extends Shader {
     super.initializeUniform();
 
     this.uniformLocationWaveNumber = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_NUMBER_NAME);
-    this.uniformLocationWaveAmplitude = this.gl.getUniformLocation(
-      this.program,
-      this.UNIFORM_WAVE_AMPLITUDE_NAME
-    );
+    this.uniformLocationWaveAmplitude = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_AMPLITUDE_NAME);
     this.uniformLocationWaveLength = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_LENGTH_NAME);
     this.unifromLocationWaveCycle = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_CYCLE_NAME);
-    this.uniformLocationWaveDirection = this.gl.getUniformLocation(
-      this.program,
-      this.UNIFORM_WAVE_DIRECTION_NAME
-    );
+    this.uniformLocationWaveDirection = this.gl.getUniformLocation(this.program, this.UNIFORM_WAVE_DIRECTION_NAME);
 
     return true;
   }
