@@ -9,7 +9,7 @@ import { ShaderFFT } from '@ts/shaderFFT';
 export class Canvas {
   /**
    * @constructor
-   * @param {string} canvasID id of canvas element
+   * @param {string} canvasID DOM dlement id of canvas element
    */
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
@@ -20,30 +20,30 @@ export class Canvas {
     }
   }
 
-  /** canvas dom element */
+  /** a dom element of this canvas */
   protected canvas: HTMLCanvasElement | null = null;
-  /** canvas element size */
+  /** this canvas element screen size [width, height] */
   protected size: number[] = [512, 512];
-  /** is mouse down or not */
+  /** is mouse left button downed or not */
   protected cursorOn: boolean = false;
-  /** current animation time */
+  /** current animation time from begin [ms] */
   protected time: number = 0.0;
-  /** to update or not */
+  /** to update rendering this canvas or not */
   protected bUpdate: boolean = true;
 
   /** shader object */
   protected shader: Shader | null = null;
 
   /**
-   * @returns {number[]} current canvas size
+   * @returns {number[]} current this canvas size [width, height]
    */
   public getSize(): number[] {
     return this.size;
   }
 
   /**
-   * edit canvas size
-   * @param {number[]} size new size
+   * Edit this canvas viewports size
+   * @param {number[]} size a new size of this canvas [width, height]
    */
   public setSize(size: number[]) {
     if (size.length > 0) {
@@ -53,8 +53,8 @@ export class Canvas {
   }
 
   /**
-   * Setup event listener mousedown, mouseup, mousemove, wheel
-   * @returns {boolean} setup is success or not
+   * Setup event listener to catch [mousedown, mouseup, mousemove, wheel] events
+   * @returns {boolean} this setup successed or not
    */
   protected initializeEventListener(): boolean {
     if (!this.canvas || !this.shader) {
@@ -111,7 +111,7 @@ export class Canvas {
   }
 
   /**
-   * Start canvas update loop
+   * Begin this canvas's renderer update loop by using async timer
    */
   public async beginUpdate(): Promise<void> {
     function animationFramePromise(): Promise<number> {
@@ -139,14 +139,13 @@ export class Canvas {
   }
 
   /**
-   * Update loop function for canvas class
-   * @param {number} deltaTime duration time between current and prev frame
+   * Update loop function which codes executed in every frame
+   * @param {number} deltaTime duration between current and prev frame [ms]
    */
   protected update(deltaTime: number): void {
     if (!this.canvas || !this.shader || deltaTime <= 0.0 || !this.bUpdate) {
       return;
     }
-
     this.shader.update(deltaTime);
   }
 }

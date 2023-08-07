@@ -1,11 +1,17 @@
 import * as ShaderUtility from '@ts/shaderUtility';
 import { Shader } from './shader';
+import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
+import VERTEX_SHADER_SYNTHESIS from '@shader/synthesis_wave.vert';
 
 export class ShaderSyntesis extends Shader {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas);
     this.initialize();
   }
+
+  protected override vertexShaderSource: string = VERTEX_SHADER_SYNTHESIS;
+  protected override fragmentShaderSource: string = FRAGMENT_SHADER_UNRIT;
+  protected override drawType: number = 1;
 
   /** uniform location of time value */
   protected uniformLocationTime: WebGLUniformLocation | null = null;
@@ -36,22 +42,17 @@ export class ShaderSyntesis extends Shader {
     [-0.2, 0.4],
   ];
 
-  protected initialize(): boolean {
+  // derived from Shader.ts
+  override initialize(): boolean {
     if (!this.gl) {
       return false;
     }
-
     super.initialize();
-
-    this.drawType = 1;
-    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_SYNTHESIS_SOURCE;
-    this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
-    ShaderUtility.generateSubdividedMesh2d(8, 8, this.vertexArray, this.colorArray, this.indexArray);
-
     return true;
   }
 
-  protected initializeUniform(): boolean {
+  // derived from Shader.ts
+  override initializeUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }
@@ -74,7 +75,8 @@ export class ShaderSyntesis extends Shader {
     return true;
   }
 
-  protected registerUniform(): boolean {
+  // derived from Shader.ts
+  override registerUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }
@@ -84,18 +86,23 @@ export class ShaderSyntesis extends Shader {
     if (this.uniformLocationTime) {
       this.gl.uniform1f(this.uniformLocationTime, this.time);
     }
+
     if (this.uniformLocationWaveNumber) {
       this.gl.uniform1i(this.uniformLocationWaveNumber, this.waveNumber);
     }
+
     if (this.uniformLocationWaveAmplitude) {
       this.gl.uniform1fv(this.uniformLocationWaveAmplitude, this.amplitude);
     }
+
     if (this.uniformLocationWaveLength) {
       this.gl.uniform1fv(this.uniformLocationWaveLength, this.length);
     }
+
     if (this.unifromLocationWaveCycle) {
       this.gl.uniform1fv(this.unifromLocationWaveCycle, this.cycle);
     }
+
     if (this.uniformLocationWaveDirection) {
       this.gl.uniform2fv(this.uniformLocationWaveDirection, this.direction.flat());
     }
@@ -114,13 +121,18 @@ export class ShaderSyntesis extends Shader {
     return true;
   }
 
-  public update(deltaTime: number) {
+  // derived from Shader.ts
+  override preUpdate(): void {
+    super.preUpdate();
+    ShaderUtility.generateSubdividedMesh2d(8, 8, this.vertexArray, this.colorArray, this.indexArray);
+  }
+
+  // derived from Shader.ts
+  override update(deltaTime: number) {
     if (!this.gl || deltaTime <= 0.0) {
       return;
     }
-
     this.calculateWaveContext();
-
     super.update(deltaTime);
   }
 }

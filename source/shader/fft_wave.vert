@@ -3,7 +3,8 @@ precision highp float;
 
 layout (location = 0) in vec3 in_VertexPosition;
 layout (location = 1) in vec4 in_VertexColor;
-layout (location = 2) in int in_vertexIndex;
+layout (location = 2) in int in_VertexIndex;
+
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_ProjectionMatrix;
@@ -15,6 +16,7 @@ uniform float u_f;
 uniform float u_Phi;
 uniform sampler2D u_texH0Re;
 uniform sampler2D u_texH0Im;
+
 out vec4 out_Color;
 out vec2 out_Ht;
 out vec2 out_UV;
@@ -79,7 +81,7 @@ void main()
 {
 	out_Color = in_VertexColor;
 
-	int index = in_vertexIndex;
+	int index = in_VertexIndex;
 	int x_index = index % u_N;
 	int y_index = int(index / u_N);
 	out_Ht = generate_spectrum(x_index, y_index);

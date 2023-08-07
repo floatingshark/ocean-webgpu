@@ -1,8 +1,10 @@
 import * as ShaderUtility from '@ts/shaderUtility';
 import * as glm from 'gl-matrix';
+import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
+import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
 
 /**
- * WebGL basic shader class
+ * WebGL basis shader class
  */
 export class Shader {
   /**
@@ -16,9 +18,9 @@ export class Shader {
   /** webgl2.0 context this canvas */
   protected gl: WebGL2RenderingContext | null = null;
   /** a using current vertex shader source code */
-  protected vertexShaderSource: string = ShaderUtility.VERTEX_SHADER_UNRIT_SOURCE;
+  protected vertexShaderSource: string = VERTEX_SHADER_UNRIT;
   /** a using current fragment shader source code */
-  protected fragmentShaderSource: string = ShaderUtility.FRAGMENT_SHADER_UNRIT_SOURCE;
+  protected fragmentShaderSource: string = FRAGMENT_SHADER_UNRIT;
   /** current shader program */
   protected program: WebGLProgram | null = null;
   /** current shader draw type */
@@ -30,11 +32,6 @@ export class Shader {
   protected colorBuffer: WebGLBuffer | null = null;
   /** index element buffer */
   protected indexBuffer: WebGLBuffer | null = null;
-
-  /** attribute location of vertices */
-  protected attribLocationVertex: number = 0;
-  /** attribute location of vertix colors */
-  protected attribLocationColor: number = 1;
 
   /** a vertex 2D array for attribute vertex buffer */
   protected vertexArray: number[][] = ShaderUtility.MESH_2D_VERTICE;
@@ -91,11 +88,9 @@ export class Shader {
     if (!this.gl) {
       return false;
     }
-
     this.initializeShaderProgram();
     this.initializeAttribute();
     this.initializeUniform();
-
     return true;
   }
 
@@ -107,24 +102,15 @@ export class Shader {
     if (!this.gl) {
       return false;
     }
-
-    // init bg
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    // create shader
     const vertexShader: WebGLShader | null = ShaderUtility.createVertexShader(this.gl, this.vertexShaderSource);
     const fragmentShader: WebGLShader | null = ShaderUtility.createFragmentShader(this.gl, this.fragmentShaderSource);
 
-    // create program
     if (vertexShader && fragmentShader) {
       this.program = ShaderUtility.createProgram(this.gl, vertexShader, fragmentShader);
       this.gl.useProgram(this.program);
-
-      if (this.program) {
-        this.attribLocationVertex = this.gl.getAttribLocation(this.program, 'in_VertexPosition');
-        this.attribLocationColor = this.gl.getAttribLocation(this.program, 'in_Color');
-      }
     }
     return true;
   }
@@ -134,21 +120,24 @@ export class Shader {
    * @returns {boolean} setup is success or not
    */
   protected initializeAttribute(): boolean {
-    if (!this.gl) {
+    if (!this.gl || !this.program) {
       return false;
     }
+
+    const attribLocationVertex: number = this.gl.getAttribLocation(this.program, 'in_VertexPosition');
+    const attribLocationColor: number = this.gl.getAttribLocation(this.program, 'in_Color');
 
     this.vertexBuffer = this.gl.createBuffer();
     this.colorBuffer = this.gl.createBuffer();
     this.indexBuffer = this.gl.createBuffer();
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-    this.gl.enableVertexAttribArray(this.attribLocationVertex);
-    this.gl.vertexAttribPointer(this.attribLocationVertex, ShaderUtility.VERTEX_SIZE, this.gl.FLOAT, false, 0, 0);
+    this.gl.enableVertexAttribArray(attribLocationVertex);
+    this.gl.vertexAttribPointer(attribLocationVertex, ShaderUtility.VERTEX_SIZE, this.gl.FLOAT, false, 0, 0);
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
-    this.gl.enableVertexAttribArray(this.attribLocationColor);
-    this.gl.vertexAttribPointer(this.attribLocationColor, ShaderUtility.COLOR_SIZE, this.gl.FLOAT, false, 0, 0);
+    this.gl.enableVertexAttribArray(attribLocationColor);
+    this.gl.vertexAttribPointer(attribLocationColor, ShaderUtility.COLOR_SIZE, this.gl.FLOAT, false, 0, 0);
 
     return true;
   }
@@ -211,12 +200,15 @@ export class Shader {
     if (this.uniformLocationModelMatrix) {
       this.gl.uniformMatrix4fv(this.uniformLocationModelMatrix, false, this.modelMatrix);
     }
+
     if (this.uniformLocationViewMatrix) {
       this.gl.uniformMatrix4fv(this.uniformLocationViewMatrix, false, this.viewMatrix);
     }
+
     if (this.uniformLocationProjectionMatrix) {
       this.gl.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
     }
+
     if (this.uniformLocationTime) {
       this.gl.uniform1f(this.uniformLocationTime, this.time);
     }
@@ -248,7 +240,6 @@ export class Shader {
    * @returns {boolean} calculated successfully or not
    */
   protected calculateMvpMatrices(): boolean {
-    // Create model matrix
     const translateMatrix: glm.mat4 = glm.mat4.translate(glm.mat4.create(), glm.mat4.create(), [
       this.position[0],
       this.position[1],
@@ -289,10 +280,8 @@ export class Shader {
       scaleMatrix
     );
 
-    // Create view matrix
     this.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), this.viewPosition, this.viewLookAt, this.viewUp);
 
-    // Create prjection matrix
     this.projectionMatrix = glm.mat4.perspective(
       glm.mat4.create(),
       this.projectionFovy,
@@ -321,11 +310,11 @@ export class Shader {
     if (!this.gl || deltaTime <= 0.0) {
       return;
     }
+    this.time += deltaTime;
 
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    this.time += deltaTime;
     this.calculateMvpMatrices();
 
     this.registerAttribute();

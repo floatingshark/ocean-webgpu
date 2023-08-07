@@ -1,22 +1,6 @@
-import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
-import FRAGMENT_SHADER_UNRIT from '@shader/unlit.frag';
-import VERTEX_SHADER_SYNTHESIS from '@shader/synthesis_wave.vert';
-import VERTEX_SHADER_FFT from '@shader/fft_wave.vert';
-import FRAGMENT_SHADER_FFT from '@shader/fft_wave.frag';
-
 /**
- * OpenGL shader util export functions and parameters
+ * Utility - constant values / calculation snippets
  */
-/** a unlit vertex shader raw source code */
-export const VERTEX_SHADER_UNRIT_SOURCE = VERTEX_SHADER_UNRIT;
-/** a unlit fragment shader raw source code */
-export const FRAGMENT_SHADER_UNRIT_SOURCE = FRAGMENT_SHADER_UNRIT;
-/** a gaussian wave shader raw source code */
-export const VERTEX_SHADER_SYNTHESIS_SOURCE = VERTEX_SHADER_SYNTHESIS;
-/** a vertex fft wave shader raw source code */
-export const VERTEX_SHADER_FFT_SOURCE = VERTEX_SHADER_FFT;
-/** a fragment fft wave shader raw source code */
-export const FRAGMENT_SHADER_FFT_SOURCE = FRAGMENT_SHADER_FFT;
 
 /** difinition of vertex dimension size */
 export const VERTEX_SIZE: number = 3;
@@ -80,6 +64,7 @@ export function createVertexShader(glContext: WebGLRenderingContext, source: str
   }
   return vertexShader;
 }
+
 /**
  * compile fragment shader and get shader object
  * @param {WebGLRenderingContext} glContext webGL context in target canvas
@@ -99,6 +84,7 @@ export function createFragmentShader(glContext: WebGLRenderingContext, source: s
   }
   return fragmentShader;
 }
+
 /**
  * merge vertex and fragment shader and get shade program
  * @param {WebGLRenderingContext} glContext webGL context in target canvas
@@ -190,6 +176,23 @@ export function generateGaussianRandom(seed: number[], out: number[]) {
   }
 }
 
+/**
+ * 32 bit float to rgba [0, 255] 8bit * 4 values
+ * @param inFloat A float value for encoding
+ * @returns AN Endoced rgba value
+ */
+export function encodeFloatToRGBA(inFloat: number): number[] {
+  const v1: number = inFloat * 255.0;
+  const r: number = Math.floor(v1);
+  const v2: number = (v1 - r) * 255.0;
+  const g: number = Math.floor(v2);
+  const v3: number = (v2 - g) * 255.0;
+  const b: number = Math.floor(v3);
+  const v4: number = (v3 - b) * 255.0;
+  const a: number = Math.floor(v4);
+  return [r, g, b, a];
+}
+
 // prettier-ignore
 export const MESH_2D_VERTICE: number[][] = [
 	[-1.0, -1.0, 0.0],
@@ -197,6 +200,7 @@ export const MESH_2D_VERTICE: number[][] = [
 	[1.0, 1.0, 0.0],
 	[1.0, -1.0, 0.0]
 ];
+
 /**
  * a simple 2x2 mesh vertex color data
  */
@@ -207,6 +211,7 @@ export const MESH_2D_COLOR: number[][] = [
 	[0.0, 0.0, 1.0, 1.0],
 	[1.0, 1.0, 1.0, 1.0],
 ];
+
 /**
  * a simple 2x2 mesh index data
  */
@@ -216,7 +221,7 @@ export const MESH_2D_INDEX: number[][] = [
   [0, 2, 3]
 ];
 
-/** deprecated =============================== */
+/** Deprecated =============================== */
 
 /**
  * @deprecated

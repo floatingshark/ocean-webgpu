@@ -1,5 +1,7 @@
 import * as ShaderUtility from '@ts/shaderUtility';
 import { Shader } from './shader';
+import VERTEX_SHADER_FFT from '@shader/fft_wave.vert';
+import FRAGMENT_SHADER_FFT from '@shader/fft_wave.frag';
 
 /**
  * WebGL shader class for fft ocean
@@ -9,6 +11,10 @@ export class ShaderFFT extends Shader {
     super(canvas);
     this.initialize();
   }
+
+  protected override vertexShaderSource: string = VERTEX_SHADER_FFT;
+  protected override fragmentShaderSource: string = FRAGMENT_SHADER_FFT;
+  protected override drawType: number = 1;
 
   protected vertexIndex: number[] = [];
 
@@ -20,6 +26,8 @@ export class ShaderFFT extends Shader {
   protected phi: number = 50000;
   protected h0ReData: ImageData = new ImageData(this.N, this.N);
   protected h0ImData: ImageData = new ImageData(this.N, this.N);
+
+  protected vertexIndexBuffer: WebGLBuffer | null = null;
 
   protected uniformLocationN: WebGLUniformLocation | null = null;
   protected uniformLocationA: WebGLUniformLocation | null = null;
@@ -33,38 +41,34 @@ export class ShaderFFT extends Shader {
   protected textureH0Re: WebGLTexture | null = null;
   protected textureH0Im: WebGLTexture | null = null;
 
-  protected vertexIndexBuffer: WebGLBuffer | null = null;
-  protected attribLocationVertexIndex: number = 2;
-
-  protected initialize(): boolean {
+  // derived from Shader.ts
+  override initialize(): boolean {
     if (!this.gl) {
       return false;
     }
-
     super.initialize();
-
-    this.drawType = 1;
-    this.vertexShaderSource = ShaderUtility.VERTEX_SHADER_FFT_SOURCE;
-    this.fragmentShaderSource = ShaderUtility.FRAGMENT_SHADER_FFT_SOURCE;
-
     return true;
   }
 
-  protected initializeAttribute(): boolean {
-    if (!this.gl) {
+  // derived from Shader.ts
+  override initializeAttribute(): boolean {
+    if (!this.gl || !this.program) {
       return false;
     }
     super.initializeAttribute();
 
+    const attribLocationVertexIndex: number = this.gl.getAttribLocation(this.program, 'in_VertexIndex');
+
     this.vertexIndexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexIndexBuffer);
-    this.gl.enableVertexAttribArray(this.attribLocationVertexIndex);
-    this.gl.vertexAttribIPointer(this.attribLocationVertexIndex, 1, this.gl.INT, 0, 0);
+    this.gl.enableVertexAttribArray(attribLocationVertexIndex);
+    this.gl.vertexAttribIPointer(attribLocationVertexIndex, 1, this.gl.INT, 0, 0);
 
     return true;
   }
 
-  protected registerAttribute(): boolean {
+  // derived from Shader.ts
+  override registerAttribute(): boolean {
     if (!this.gl) {
       return false;
     }
@@ -78,7 +82,8 @@ export class ShaderFFT extends Shader {
     return true;
   }
 
-  protected initializeUniform(): boolean {
+  // derived from Shader.ts
+  override initializeUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }
@@ -98,7 +103,8 @@ export class ShaderFFT extends Shader {
     return true;
   }
 
-  protected registerUniform(): boolean {
+  // derived from Shader.ts
+  override registerUniform(): boolean {
     if (!this.gl || !this.program) {
       return false;
     }
@@ -201,21 +207,19 @@ export class ShaderFFT extends Shader {
         h0_i[1] = (gaussRand[1] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
 
         const imageDataIndex: number = (x + y * this.N) * 4;
-        const reRGBA: number[] = this.encodeFloatToRGBA(h0_i[0]);
+        const reRGBA: number[] = ShaderUtility.encodeFloatToRGBA(h0_i[0]);
         this.h0ReData.data[imageDataIndex] = reRGBA[0];
         this.h0ReData.data[imageDataIndex + 1] = reRGBA[1];
         this.h0ReData.data[imageDataIndex + 2] = reRGBA[2];
         this.h0ReData.data[imageDataIndex + 3] = reRGBA[3];
 
-        const imRGBA: number[] = this.encodeFloatToRGBA(h0_i[1]);
+        const imRGBA: number[] = ShaderUtility.encodeFloatToRGBA(h0_i[1]);
         this.h0ImData.data[imageDataIndex] = imRGBA[0];
         this.h0ImData.data[imageDataIndex + 1] = imRGBA[1];
         this.h0ImData.data[imageDataIndex + 2] = imRGBA[2];
         this.h0ImData.data[imageDataIndex + 3] = imRGBA[3];
       }
     }
-
-    console.log(this.h0ImData);
 
     return true;
   }
@@ -229,30 +233,19 @@ export class ShaderFFT extends Shader {
     return true;
   }
 
-  public preUpdate(): void {
+  // derived from Shader.ts
+  override preUpdate(): void {
     super.preUpdate();
-
     ShaderUtility.generateSubdividedMesh2d(this.size, this.N, this.vertexArray, this.colorArray, this.indexArray);
     this.calcurateH0();
     this.calcurateVertexIndex();
   }
 
-  public update(deltaTime: number) {
+  // derived from Shader.ts
+  override update(deltaTime: number) {
     if (!this.gl || deltaTime <= 0.0) {
       return;
     }
     super.update(deltaTime);
-  }
-
-  protected encodeFloatToRGBA(inFloat: number): number[] {
-    const v1: number = inFloat * 255.0;
-    const r: number = Math.floor(v1);
-    const v2: number = (v1 - r) * 255.0;
-    const g: number = Math.floor(v2);
-    const v3: number = (v2 - g) * 255.0;
-    const b: number = Math.floor(v3);
-    const v4: number = (v3 - b) * 255.0;
-    const a: number = Math.floor(v4);
-    return [r, g, b, a];
   }
 }
