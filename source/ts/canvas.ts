@@ -15,6 +15,8 @@ export class Canvas {
     this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
 
     if (this.canvas !== null) {
+      this.canvas.width = this.size[0];
+      this.canvas.height = this.size[1];
       this.shader = new ShaderFFT(this.canvas);
       this.initializeEventListener();
     }
@@ -49,6 +51,10 @@ export class Canvas {
     if (size.length > 0) {
       this.size[0] = size[0];
       this.size[1] = size[1];
+      if (this.canvas) {
+        this.canvas.width = this.size[0];
+        this.canvas.height = this.size[1];
+      }
     }
   }
 
@@ -130,7 +136,7 @@ export class Canvas {
     while (this.canvas) {
       await animationFramePromise();
       const deltaTime = Date.now() - prevTime;
-      if (deltaTime > FPS_30) {
+      if (deltaTime > FPS_30 / 2.0) {
         prevTime = Date.now();
         this.update(deltaTime);
       }
