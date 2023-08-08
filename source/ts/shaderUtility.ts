@@ -95,7 +95,7 @@ export function generateSubdividedMesh2d(
     for (let x = 0; x < lattice; x++) {
       const index: number = x + lattice * y;
       const origin: number = -lattice / 2.0;
-      vertice[index] = [((origin + x) / lattice) * size, ((origin + y) / lattice) * size, 0.0];
+      vertice[index] = [((origin + x + 0.5) / lattice) * size, ((origin + y + 0.5) / lattice) * size, 0.0];
       colors[index] = [1.0, 1.0, 1.0, 1.0];
       if (x < lattice - 1 && y < lattice - 1) {
         if (y % 2 == 0) {

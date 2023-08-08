@@ -15,8 +15,8 @@ export class Canvas {
     this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
 
     if (this.canvas !== null) {
-      this.canvas.width = this.size[0];
-      this.canvas.height = this.size[1];
+      this.canvas.width = this.canvas.clientWidth;
+      this.canvas.height = this.canvas.clientHeight;
       this.shader = new ShaderFFT(this.canvas);
       this.initializeEventListener();
     }
@@ -24,8 +24,6 @@ export class Canvas {
 
   /** The DOM element of this canvas */
   protected canvas: HTMLCanvasElement | null = null;
-  /** This canvas element's screen size [width, height] */
-  protected size: number[] = [512, 512];
   /** A flag of mouse left button downed*/
   protected bMouseOn: boolean = false;
   /** Current rendering context elapsed time[ms] */
@@ -37,28 +35,6 @@ export class Canvas {
   protected shader: Shader | null = null;
 
   /**
-   * @returns {number[]} Current canvas viewport size [width, height]
-   */
-  public getSize(): number[] {
-    return this.size;
-  }
-
-  /**
-   * Edit this canvas viewports size
-   * @param {number[]} size A new size of this canvas [width, height]
-   */
-  public setSize(size: number[]) {
-    if (size.length > 0) {
-      this.size[0] = size[0];
-      this.size[1] = size[1];
-      if (this.canvas) {
-        this.canvas.width = this.size[0];
-        this.canvas.height = this.size[1];
-      }
-    }
-  }
-
-  /**
    * Register some event listeners [mousedown, mouseup, mousemove, wheel]
    */
   protected initializeEventListener(): boolean {
@@ -68,6 +44,13 @@ export class Canvas {
 
     let view = this.shader.viewPosition;
     const look = this.shader.viewLookAt;
+
+    this.canvas.addEventListener('resize', () => {
+      if (this.canvas) {
+        this.canvas.width = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
+      }
+    });
 
     this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
       this.bMouseOn = true;

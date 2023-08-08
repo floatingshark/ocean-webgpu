@@ -1,26 +1,39 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+
 body {
   background-color: ghostwhite;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Josefin Sans';
 }
 
 .title {
   text-align: center;
-  font-size: 2.5em;
-  /*font-weight: bold;*/
-  padding-top: 1em;
-  padding-bottom: 0.5em;
+  font-size: 3em;
+  font-weight: bold;
+  color: #333333;
+  padding-top: 5vh;
+  padding-bottom: 3vh;
 }
 
-.canvas-container {
+.body-container {
+  display: grid;
+  grid-template-columns: 70em;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.body-center-wrapper {
   text-align: center;
+  background-color: #444444;
+  width: 33vw;
+  height: 33vw;
+  border-radius: 0.4em;
 }
 
 #canvas {
-  width: 512px;
-  height: 512px;
+  width: 33vw;
+  height: 33vw;
 }
 
 .footer {
   text-align: center;
-  padding-top: 20px;
+  padding-top: 5vh;
 }

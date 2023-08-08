@@ -26,5 +26,6 @@ void main() {
   //fragment = vec4(sampleColor, 1.0);
 
   //fragment = texture(u_texH0Re, out_UV);
+  //fragment = vec4(0.0, 0.0, 0.0, 1.0);
   fragment = vec4(1.0, 1.0, 1.0, 1.0);
 }

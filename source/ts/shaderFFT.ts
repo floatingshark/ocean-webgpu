@@ -19,8 +19,8 @@ export class ShaderFFT extends Shader {
   protected vertexIndex: number[] = [];
 
   protected size: number = 5.0;
-  protected N: number = 32;
-  protected A: number = 0.2;
+  protected N: number = 8;
+  protected A: number = 50.0;
   protected T: number = 200.0;
   protected f: number = 1.0;
   protected phi: number = 50000;

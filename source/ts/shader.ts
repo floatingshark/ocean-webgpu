@@ -57,7 +57,7 @@ export class Shader {
   protected modelMatrix: glm.mat4 = glm.mat4.create();
 
   /** View position / Camera position */
-  public viewPosition: glm.vec3 = [-1, -2, 0.3];
+  public viewPosition: glm.vec3 = [-0.5, -3.0, 5.0];
   /** Look at position */
   public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
   /** Basis upvector, basically [0, 1, 0] or [0, 0, 0] and it depends on emvironments */
@@ -226,6 +226,9 @@ export class Shader {
       return false;
     }
 
+    this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
     const INDEX_LENGTH: number = this.indexArray.flat().length;
     if (this.drawType == 0) {
       this.gl.drawElements(this.gl.TRIANGLES, INDEX_LENGTH, this.gl.UNSIGNED_SHORT, 0);
@@ -313,9 +316,6 @@ export class Shader {
       return;
     }
     this.time += deltaTime;
-
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
     this.calculateMvpMatrices();
 
