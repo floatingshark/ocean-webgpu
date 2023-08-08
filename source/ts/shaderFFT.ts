@@ -46,7 +46,6 @@ export class ShaderFFT extends Shader {
   private UNIFORM_T_NAME: string = 'u_T';
   private UNIFORM_F_NAME: string = 'u_f';
   private UNIFORM_PHI_NAME: string = 'u_Phi';
-  private UNIFORM_H0_NAME: string = 'u_texH0';
   private UNIFORM_H0_REAL_NAME: string = 'u_texH0Re';
   private UNIFORM_H0_IMAGINARY_NAME: string = 'u_texH0Im';
 
@@ -97,7 +96,6 @@ export class ShaderFFT extends Shader {
       return false;
     }
     super.initializeUniform();
-
     this.uniformLocationN = this.gl.getUniformLocation(this.program, this.UNIFORM_N_NAME);
     this.uniformLocationA = this.gl.getUniformLocation(this.program, this.UNIFORM_A_NAME);
     this.uniformLocationT = this.gl.getUniformLocation(this.program, this.UNIFORM_T_NAME);

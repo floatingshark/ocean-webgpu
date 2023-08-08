@@ -33,7 +33,7 @@ export function createFragmentShader(glContext: WebGLRenderingContext, source: s
   if (fragmentShader) {
     glContext.shaderSource(fragmentShader, source);
     glContext.compileShader(fragmentShader);
-
+    
     if (!glContext.getShaderParameter(fragmentShader, glContext.COMPILE_STATUS)) {
       const info = glContext.getShaderInfoLog(fragmentShader);
       console.warn(info);
@@ -59,7 +59,7 @@ export function createProgram(
     glContext.attachShader(program, vertex);
     glContext.attachShader(program, fragment);
     glContext.linkProgram(program);
-
+    
     if (!glContext.getProgramParameter(program, glContext.LINK_STATUS)) {
       const info: string | null = glContext.getProgramInfoLog(program);
       console.warn(info);

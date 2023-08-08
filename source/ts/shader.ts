@@ -98,8 +98,6 @@ export class Shader {
       return false;
     }
     this.initializeShaderProgram();
-    this.initializeAttribute();
-    this.initializeUniform();
     return true;
   }
 
@@ -299,6 +297,8 @@ export class Shader {
    * This function will be executed once before update loop
    */
   public preUpdate(): void {
+    this.initializeAttribute();
+    this.initializeUniform();
     this.registerAttribute();
     this.registerUniform();
     this.draw();

@@ -5,7 +5,6 @@ in vec4 out_Color;
 in vec2 out_Ht;
 in vec2 out_UV;
 in vec2 out_UV_m;
-uniform int u_N;
 uniform sampler2D u_texH0;
 uniform sampler2D u_texH0Re;
 uniform sampler2D u_texH0Im;
