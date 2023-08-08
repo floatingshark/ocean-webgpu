@@ -5,6 +5,7 @@ Some simple shaders written in **TypeScript** and **WebGL2.0** for rendering wat
 Check out this [page](https://samenachan.github.io/wateri/public/) to see computer graphic's water surfaces on web.
 
 # Acknowledgments
+[Josefin Sans](https://fonts.google.com/specimen/Josefin+Sans)  
 [gl-matrix](https://github.com/toji/gl-matrix).
 
 [GPU Gems I Chapter 1. Effective Water Simulation from Physical Models ](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models)  
