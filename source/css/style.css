@@ -1,16 +1,21 @@
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
 
 body {
-  background-color: ghostwhite;
+  height: 100vh;
+  margin: 0px;
+  background-color: #377780;
+  /*background-image: linear-gradient(#677c85, #377780);*?
+  /*background-image: linear-gradient(#676e76, #353e50);*/
   font-family: 'Josefin Sans';
+  color: white;
 }
 
 .title {
   text-align: center;
-  font-size: 3em;
-  font-weight: bold;
-  color: #333333;
-  padding-top: 5vh;
+  font-size: 3.5em;
+  font-weight: normal;
+  color: white;
+  padding-top: 6vh;
   padding-bottom: 3vh;
 }
 
@@ -22,18 +27,30 @@ body {
 
 .body-center-wrapper {
   text-align: center;
-  background-color: #444444;
-  width: 33vw;
-  height: 33vw;
+}
+
+.canvas-wrapper{
+  background-color: #363d4188;
+  width: 28vw;
+  height: 28vw;
+  margin: auto;
   border-radius: 0.4em;
 }
 
 #canvas {
-  width: 33vw;
-  height: 33vw;
+  width: inherit;
+  height: inherit;
+}
+
+
+.body-right-wrapper{
+  text-align: left;
+  font-size: 1.3em;
+  padding-left: 2vw;
 }
 
 .footer {
   text-align: center;
+  font-size: 1.2em;
   padding-top: 5vh;
 }
