@@ -29,7 +29,7 @@ body {
   text-align: center;
 }
 
-.canvas-wrapper{
+.canvas-wrapper {
   background-color: #363d4188;
   width: 28vw;
   height: 28vw;
@@ -42,8 +42,7 @@ body {
   height: inherit;
 }
 
-
-.body-right-wrapper{
+.body-right-wrapper {
   text-align: left;
   font-size: 1.3em;
   padding-left: 2vw;
