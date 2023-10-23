@@ -1,7 +1,7 @@
 import * as glm from 'gl-matrix';
+import { Scene } from '@ts/scene';
 import { GLShader } from '@ts/glShader';
-import { GLShaderFFT } from '@ts/shaderFFT';
-//import { ShaderSyntesis } from '@ts/shaderSynthesis';
+import { GLShaderFFT } from '@ts/glShaderFFT';
 
 export class Canvas {
 	constructor(canvasID: string) {
@@ -12,25 +12,26 @@ export class Canvas {
 	protected bMouseOn: boolean = false;
 	protected time: number = 0.0;
 	protected bUpdate: boolean = true;
-	protected shader: GLShader | null = null;
+
+	protected glShader: GLShader | null = null;
 
 	protected construct(canvasID: string): void {
 		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
 		if (this.canvas !== null) {
 			this.canvas.width = this.canvas.clientWidth;
 			this.canvas.height = this.canvas.clientHeight;
-			this.shader = new GLShaderFFT(this.canvas);
+			this.glShader = new GLShaderFFT(this.canvas);
 			this.initializeEventListener();
 		}
 	}
 
 	protected initializeEventListener(): boolean {
-		if (!this.canvas || !this.shader) {
+		if (!this.canvas || !this.glShader) {
 			return false;
 		}
 
-		let view = this.shader.viewPosition;
-		const look = this.shader.viewLookAt;
+		let view = this.glShader.viewPosition;
+		const lookat = this.glShader.viewLookAt;
 
 		this.canvas.addEventListener('resize', () => {
 			if (this.canvas) {
@@ -61,21 +62,21 @@ export class Canvas {
 				// temp Y movement(not orbital rotate)
 				const MOVEMENT_MAGNITUDE: number = 0.01;
 				view[2] += e.movementY * MOVEMENT_MAGNITUDE;
-				if (this.shader) {
-					this.shader.viewPosition = view;
+				if (this.glShader) {
+					this.glShader.viewPosition = view;
 				}
 			}
 		});
 
 		this.canvas.addEventListener('wheel', (e: WheelEvent) => {
 			const ZOOM_MAGNITUDE: number = 0.01;
-			let zoomBasis: glm.vec3 = glm.vec3.subtract(glm.vec3.create(), look, view);
+			let zoomBasis: glm.vec3 = glm.vec3.subtract(glm.vec3.create(), lookat, view);
 			zoomBasis = glm.vec3.normalize(zoomBasis, zoomBasis);
 			let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
 			zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
 			glm.vec3.add(view, view, zoomVec);
-			if (this.shader) {
-				this.shader.viewPosition = view;
+			if (this.glShader) {
+				this.glShader.viewPosition = view;
 			}
 		});
 
@@ -89,8 +90,8 @@ export class Canvas {
 			});
 		}
 
-		if (this.shader) {
-			this.shader.preUpdate();
+		if (this.glShader) {
+			this.glShader.preUpdate();
 		}
 
 		const FPS_30 = 33.33;
@@ -106,9 +107,11 @@ export class Canvas {
 	}
 
 	protected update(deltaTime: number): void {
-		if (!this.canvas || !this.shader || deltaTime <= 0.0 || !this.bUpdate) {
+		if (!this.canvas || !this.glShader || !this.bUpdate) {
 			return;
 		}
-		this.shader.update(deltaTime);
+
+		Scene.update();
+		this.glShader.update(deltaTime);
 	}
 }

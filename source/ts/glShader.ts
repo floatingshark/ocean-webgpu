@@ -18,9 +18,9 @@ export class GLShader {
 	protected colorBuffer: WebGLBuffer | null = null;
 	protected indexBuffer: WebGLBuffer | null = null;
 
-	protected vertexArray: number[][] = ShaderAPI.MESH_2D_VERTICE;
-	protected colorArray: number[][] = ShaderAPI.MESH_2D_COLOR;
-	protected indexArray: number[][] = ShaderAPI.MESH_2D_INDEX;
+	protected vertexArray: number[][] = ShaderAPI.MESH_PLANE_VERTICE;
+	protected colorArray: number[][] = ShaderAPI.MESH_PLANE_COLOR;
+	protected indexArray: number[][] = ShaderAPI.MESH_PLANE_INDEX;
 
 	protected uniformLocationModelMatrix: WebGLUniformLocation | null = null;
 	protected uniformLocationViewMatrix: WebGLUniformLocation | null = null;

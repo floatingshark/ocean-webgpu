@@ -1,3 +1,5 @@
+/** WebGL Snippets ========================= */
+
 export function createWebGLVertexShader(glContext: WebGLRenderingContext, source: string): WebGLShader | null {
 	const vertexShader: WebGLShader | null = glContext.createShader(glContext.VERTEX_SHADER);
 	if (vertexShader) {
@@ -44,6 +46,8 @@ export function createWebGLProgram(
 	}
 	return program;
 }
+
+/** Generate Functions ====================== */
 
 export function generateSubdividedMesh2d(
 	size: number,
@@ -108,8 +112,10 @@ export function encodeFloatToRGBA(inFloat: number): number[] {
 	return [r, g, b, a];
 }
 
+/** Mesh Datum ================================= */
+
 // prettier-ignore
-export const MESH_2D_VERTICE: number[][] = [
+export const MESH_PLANE_VERTICE: number[][] = [
 	[-1.0, -1.0, 0.0],
 	[-1.0, 1.0, 0.0],
 	[1.0, 1.0, 0.0],
@@ -117,7 +123,7 @@ export const MESH_2D_VERTICE: number[][] = [
 ];
 
 // prettier-ignore
-export const MESH_2D_COLOR: number[][] = [
+export const MESH_PLANE_COLOR: number[][] = [
 	[1.0, 0.0, 0.0, 1.0],
 	[0.0, 1.0, 0.0, 1.0],
 	[0.0, 0.0, 1.0, 1.0],
@@ -125,17 +131,13 @@ export const MESH_2D_COLOR: number[][] = [
 ];
 
 // prettier-ignore
-export const MESH_2D_INDEX: number[][] = [
+export const MESH_PLANE_INDEX: number[][] = [
   [0, 1, 2], 
   [0, 2, 3]
 ];
 
 /** Deprecated =============================== */
 
-/**
- * @deprecated
- * a simple 2x2 mesh vertex array type data
- */
 // prettier-ignore
 export const MESH_2D_VERTICE_ARRAY_TYPE: Float32Array = new Float32Array([
 	-1.0, -1.0, 0.0,
@@ -143,10 +145,7 @@ export const MESH_2D_VERTICE_ARRAY_TYPE: Float32Array = new Float32Array([
 	1.0, 1.0, 0.0,
 	1.0, -1.0, 0.0,
 ]);
-/**
- * @deprecated
- * a simple 2x2 mesh vertex color array type data
- */
+
 // prettier-ignore
 export const MESH_2D_COLOR_ARRAY_TYPE: Float32Array = new Float32Array([
 	1.0, 0.0, 0.0, 1.0,
@@ -154,10 +153,7 @@ export const MESH_2D_COLOR_ARRAY_TYPE: Float32Array = new Float32Array([
 	0.0, 0.0, 1.0, 1.0,
 	1.0, 1.0, 1.0, 1.0,
 ]);
-/**
- * @deprecated
- * a simple 2x2 mesh index array type data
- */
+
 // prettier-ignore
 export const MESH_2D_INDEX_ARRAY_TYPE: Int32Array = new Int32Array([
   0, 1, 2, 
