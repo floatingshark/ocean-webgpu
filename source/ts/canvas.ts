@@ -85,6 +85,8 @@ export class Canvas {
 	public async initializeContext(): Promise<void> {
 		if ((this.canvas && this, this.webGPU)) {
 			await this.webGPU.initializeWebGPUContexts(this.canvas as HTMLCanvasElement);
+			this.webGPU.initializeShader();
+			this.webGPU.drawCommand();
 		}
 	}
 
