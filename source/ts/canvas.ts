@@ -1,7 +1,8 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
+import { WebGPU } from './webGPU';
 import { GLShader } from '@ts/glShader';
-import { GLShaderFFT } from '@ts/glShaderFFT';
+//import { GLShaderFFT } from '@ts/glShaderFFT';
 
 export class Canvas {
 	constructor(canvasID: string) {
@@ -13,20 +14,22 @@ export class Canvas {
 	protected time: number = 0.0;
 	protected bUpdate: boolean = true;
 
-	protected glShader: GLShader | null = null;
+	protected webGL: GLShader | null = null;
+	protected webGPU: WebGPU | null = null;
 
 	protected construct(canvasID: string): void {
 		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
-		if (this.canvas !== null) {
+		if (this.canvas) {
 			this.canvas.width = this.canvas.clientWidth;
 			this.canvas.height = this.canvas.clientHeight;
-			this.glShader = new GLShaderFFT(this.canvas);
+			//this.webGL = new GLShaderFFT(this.canvas);
+			this.webGPU = new WebGPU();
 			this.initializeEventListener();
 		}
 	}
 
 	protected initializeEventListener(): boolean {
-		if (!this.canvas || !this.glShader) {
+		if (!this.canvas || !this.webGL) {
 			return false;
 		}
 
@@ -73,10 +76,16 @@ export class Canvas {
 			let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
 			zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
 			glm.vec3.add(view, view, zoomVec);
-				Scene.viewPosition = view;
+			Scene.viewPosition = view;
 		});
 
 		return true;
+	}
+
+	public async initializeContext(): Promise<void> {
+		if ((this.canvas && this, this.webGPU)) {
+			await this.webGPU.initializeWebGPUContexts(this.canvas as HTMLCanvasElement);
+		}
 	}
 
 	public async beginUpdate(): Promise<void> {
@@ -86,8 +95,8 @@ export class Canvas {
 			});
 		}
 
-		if (this.glShader) {
-			this.glShader.preUpdate();
+		if (this.webGL) {
+			this.webGL.preUpdate();
 		}
 
 		const FPS_30 = 33.33;
@@ -103,11 +112,7 @@ export class Canvas {
 	}
 
 	protected update(deltaTime: number): void {
-		if (!this.canvas || !this.glShader || !this.bUpdate) {
-			return;
-		}
-
-		Scene.update();
-		this.glShader.update(deltaTime);
+		Scene.update(deltaTime);
+		//this.webGL.update(deltaTime);
 	}
 }
