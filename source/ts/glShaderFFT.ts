@@ -47,11 +47,11 @@ export class GLShaderFFT extends GLShader {
 	private UNIFORM_H0_IMAGINARY_NAME: string = 'u_texH0Im';
 
 	// derived from Shader.ts
-	override initializeAttribute(): boolean {
+	override initializeAttributeBuffer(): boolean {
 		if (!this.gl || !this.program) {
 			return false;
 		}
-		super.initializeAttribute();
+		super.initializeAttributeBuffer();
 
 		const attribLocationVertexIndex: number = 2;
 

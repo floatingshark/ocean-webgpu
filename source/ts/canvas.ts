@@ -30,8 +30,8 @@ export class Canvas {
 			return false;
 		}
 
-		let view = this.glShader.viewPosition;
-		const lookat = this.glShader.viewLookAt;
+		let view = Scene.viewPosition;
+		const lookat = Scene.viewLookAt;
 
 		this.canvas.addEventListener('resize', () => {
 			if (this.canvas) {
@@ -62,9 +62,7 @@ export class Canvas {
 				// temp Y movement(not orbital rotate)
 				const MOVEMENT_MAGNITUDE: number = 0.01;
 				view[2] += e.movementY * MOVEMENT_MAGNITUDE;
-				if (this.glShader) {
-					this.glShader.viewPosition = view;
-				}
+				Scene.viewPosition = view;
 			}
 		});
 
@@ -75,9 +73,7 @@ export class Canvas {
 			let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
 			zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
 			glm.vec3.add(view, view, zoomVec);
-			if (this.glShader) {
-				this.glShader.viewPosition = view;
-			}
+				Scene.viewPosition = view;
 		});
 
 		return true;

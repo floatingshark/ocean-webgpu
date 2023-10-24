@@ -1,3 +1,5 @@
+//import { Scene } from '@ts/scene';
+import { Scene } from '@ts/scene';
 import * as ShaderAPI from '@ts/shaderAPI';
 import * as glm from 'gl-matrix';
 import VERTEX_SHADER_UNRIT from '@shader/unlit.vert';
@@ -30,17 +32,6 @@ export class GLShader {
 	protected rotation: glm.vec3 = [0.0, 0.0, 0.0];
 	protected scale: glm.vec3 = [1.0, 1.0, 1.0];
 	protected modelMatrix: glm.mat4 = glm.mat4.create();
-
-	public viewPosition: glm.vec3 = [-0.5, -3.0, 5.0];
-	public viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
-	public viewUp: glm.vec3 = [0.0, 0.0, 1.0];
-	protected viewMatrix: glm.mat4 = glm.mat4.create();
-
-	protected projectionFovy: number = glm.glMatrix.toRadian(60.0);
-	protected projectionAspect: number = 1.0;
-	protected projectionNear: number = 0;
-	protected projectionFar: number = 10000;
-	protected projectionMatrix: glm.mat4 = glm.mat4.create();
 
 	protected uniformLocationTime: WebGLUniformLocation | null = null;
 	protected time: number = 0.0;
@@ -78,7 +69,7 @@ export class GLShader {
 		return true;
 	}
 
-	protected initializeAttribute(): boolean {
+	protected initializeAttributeBuffer(): boolean {
 		if (!this.gl || !this.program) {
 			return false;
 		}
@@ -153,11 +144,11 @@ export class GLShader {
 		}
 
 		if (this.uniformLocationViewMatrix) {
-			this.gl.uniformMatrix4fv(this.uniformLocationViewMatrix, false, this.viewMatrix);
+			this.gl.uniformMatrix4fv(this.uniformLocationViewMatrix, false, Scene.viewMatrix);
 		}
 
 		if (this.uniformLocationProjectionMatrix) {
-			this.gl.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, this.projectionMatrix);
+			this.gl.uniformMatrix4fv(this.uniformLocationProjectionMatrix, false, Scene.projectionMatrix);
 		}
 
 		if (this.uniformLocationTime) {
@@ -226,21 +217,11 @@ export class GLShader {
 			scaleMatrix
 		);
 
-		this.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), this.viewPosition, this.viewLookAt, this.viewUp);
-
-		this.projectionMatrix = glm.mat4.perspective(
-			glm.mat4.create(),
-			this.projectionFovy,
-			this.projectionAspect,
-			this.projectionNear,
-			this.projectionFar
-		);
-
 		return true;
 	}
 
 	public preUpdate(): void {
-		this.initializeAttribute();
+		this.initializeAttributeBuffer();
 		this.initializeUniform();
 		this.registerAttribute();
 		this.registerUniform();
