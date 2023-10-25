@@ -1,4 +1,5 @@
 import * as glm from 'gl-matrix';
+import { Object3D } from './object3D';
 
 export class Scene {
 	static viewPosition: glm.vec3 = [-0.5, -3.0, 5.0];
@@ -14,6 +15,17 @@ export class Scene {
 
 	static time: number = 0;
 	static deltaTime: number = 0;
+
+	static objects: Object3D[] = [];
+
+	public static initialize(): void {
+		const water: Object3D = new Object3D();
+		Scene.objects.push(water);
+	}
+
+	public static getObjects(): Object3D[] {
+		return this.objects;
+	}
 
 	public static update(deltaTime: number): void {
 		Scene.viewMatrix = glm.mat4.lookAt(glm.mat4.create(), Scene.viewPosition, Scene.viewLookAt, Scene.viewUp);

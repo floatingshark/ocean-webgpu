@@ -1,28 +1,29 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
-import { WebGPU } from './webGPU';
 import { GLShader } from '@ts/glShader';
-//import { GLShaderFFT } from '@ts/glShaderFFT';
+import { WebGPU } from './webGPU';
+
+// import { GLShaderFFT } from '@ts/glShaderFFT';
 
 export class Canvas {
 	constructor(canvasID: string) {
 		this.construct(canvasID);
 	}
 
+	public webGL: GLShader | null = null;
+	public webGPU: WebGPU | null = null;
+
 	protected canvas: HTMLCanvasElement | null = null;
 	protected bMouseOn: boolean = false;
-	protected time: number = 0.0;
 	protected bUpdate: boolean = true;
-
-	protected webGL: GLShader | null = null;
-	protected webGPU: WebGPU | null = null;
 
 	protected construct(canvasID: string): void {
 		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
 		if (this.canvas) {
 			this.canvas.width = this.canvas.clientWidth;
 			this.canvas.height = this.canvas.clientHeight;
-			//this.webGL = new GLShaderFFT(this.canvas);
+
+			// this.webGL = new GLShaderFFT(this.canvas);
 			this.webGPU = new WebGPU();
 			this.initializeEventListener();
 		}
@@ -82,39 +83,24 @@ export class Canvas {
 		return true;
 	}
 
-	public async initializeContext(): Promise<void> {
+	public async initializeRenderingContexts(): Promise<void> {
 		if ((this.canvas && this, this.webGPU)) {
 			await this.webGPU.initializeWebGPUContexts(this.canvas as HTMLCanvasElement);
 			this.webGPU.initializeShader();
-			this.webGPU.drawCommand();
-		}
-	}
-
-	public async beginUpdate(): Promise<void> {
-		function animationFramePromise(): Promise<number> {
-			return new Promise<number>((resolve) => {
-				globalThis.requestAnimationFrame(resolve);
-			});
 		}
 
 		if (this.webGL) {
 			this.webGL.preUpdate();
 		}
-
-		const FPS_30 = 33.33;
-		let prevTime = Date.now();
-		while (this.canvas) {
-			await animationFramePromise();
-			const deltaTime = Date.now() - prevTime;
-			if (deltaTime > FPS_30 / 2.0) {
-				prevTime = Date.now();
-				this.update(deltaTime);
-			}
-		}
 	}
 
-	protected update(deltaTime: number): void {
-		Scene.update(deltaTime);
-		//this.webGL.update(deltaTime);
+	public update(): void {
+		/*
+		if (this.webGL) {
+			this.webGL.update(deltaTime);
+		}*/
+		if (this.webGPU) {
+			this.webGPU.draw();
+		}
 	}
 }

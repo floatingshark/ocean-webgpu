@@ -1,13 +1,13 @@
 import * as ShaderAPI from '@ts/shaderAPI';
+import { Scene } from '@ts/scene';
 
 export class WebGPU {
 	constructor() {}
 
-	protected adapter: GPUAdapter | null = null;
-	protected device: GPUDevice | null = null;
-	protected context: GPUCanvasContext | null = null;
-	protected canvasFormat: GPUTextureFormat | null = null;
-	protected encoder: GPUCommandEncoder | null = null;
+	public adapter: GPUAdapter | null = null;
+	public device: GPUDevice | null = null;
+	public context: GPUCanvasContext | null = null;
+	public canvasFormat: GPUTextureFormat | null = null;
 
 	protected vertices: Float32Array = new Float32Array();
 	protected vertexBuffer: GPUBuffer | null = null;
@@ -35,8 +35,6 @@ export class WebGPU {
 				format: this.canvasFormat,
 			});
 		}
-
-		this.encoder = this.device.createCommandEncoder();
 	}
 
 	public initializeShader(): void {
@@ -99,10 +97,15 @@ export class WebGPU {
 		}
 	}
 
-	public drawCommand(): void {
-		if (this.device && this.encoder) {
+	public draw(): void {
+		if (!this.device) {
+			return;
+		}
+
+		const encoder: GPUCommandEncoder = this.device.createCommandEncoder();
+		if (encoder) {
 			if (this.context) {
-				const pass = this.encoder.beginRenderPass({
+				const pass: GPURenderPassEncoder = encoder.beginRenderPass({
 					colorAttachments: [
 						{
 							view: this.context.getCurrentTexture().createView(),
@@ -113,18 +116,15 @@ export class WebGPU {
 					],
 				});
 
-				if (this.cellPipeline && this.vertexBuffer) {
-					pass.setPipeline(this.cellPipeline);
-					pass.setVertexBuffer(0, this.vertexBuffer);
-					pass.draw(this.vertices.length / 3); // 6 vertices
+				for (const object of Scene.getObjects()) {
+					object.material.drawCommand(pass);
 				}
 
 				pass.end();
 			}
 
-			const commandBuffer = this.encoder.finish();
+			const commandBuffer = encoder.finish();
 			this.device.queue.submit([commandBuffer]);
-			this.device.queue.submit([this.encoder.finish()]);
 		}
 	}
 }
