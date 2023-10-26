@@ -136,8 +136,6 @@ export const MESH_PLANE_INDEX: number[][] = [
   [0, 2, 3]
 ];
 
-/** Deprecated =============================== */
-
 // prettier-ignore
 export const MESH_2D_VERTICE_ARRAY_TYPE: Float32Array = new Float32Array([
 	-1.0, -1.0, 0.0,

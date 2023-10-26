@@ -19,6 +19,8 @@ export class Scene {
 	static objects: Object3D[] = [];
 
 	public static initialize(): void {
+		Scene.update(0.0);
+
 		const water: Object3D = new Object3D();
 		Scene.objects.push(water);
 	}

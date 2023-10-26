@@ -20,15 +20,12 @@ function animationFramePromise(): Promise<number> {
 	});
 }
 
-const FPS_30 = 33.33;
 let prevTime = Date.now();
 while (canvas) {
 	await animationFramePromise();
 	const deltaTime = Date.now() - prevTime;
-	if (deltaTime > FPS_30) {
-		prevTime = Date.now();
+	prevTime = Date.now();
 
-		Scene.update(deltaTime);
-		canvas.update();
-	}
+	Scene.update(deltaTime);
+	canvas.update();
 }

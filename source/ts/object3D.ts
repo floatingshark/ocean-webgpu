@@ -10,15 +10,15 @@ export class Object3D {
 	protected rotation: number[] = [0.0, 0.0, 0.0];
 	protected scale: number[] = [0.0, 0.0, 0.0];
 
-	protected vertices: Float32Array = ShaderAPI.MESH_2D_VERTICE_ARRAY_TYPE;
-	protected indices: Int32Array = ShaderAPI.MESH_2D_INDEX_ARRAY_TYPE;
+	protected vertexArray: Float32Array = ShaderAPI.MESH_2D_VERTICE_ARRAY_TYPE;
+	protected indexArray: Int32Array = ShaderAPI.MESH_2D_INDEX_ARRAY_TYPE;
 
 	public material: Material = new Material();
 
 	protected construct() {}
 
 	public initializeMaterial(device: GPUDevice, canvasFormat: GPUTextureFormat) {
-		this.material.initialize(device, canvasFormat, this.vertices);
+		this.material.initialize(device, canvasFormat, this.vertexArray, this.indexArray);
 	}
 
 	public update(): void {}

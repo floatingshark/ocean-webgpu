@@ -19,19 +19,21 @@ export class Canvas {
 
 	protected construct(canvasID: string): void {
 		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
-		if (this.canvas) {
-			this.canvas.width = this.canvas.clientWidth;
-			this.canvas.height = this.canvas.clientHeight;
-
-			// this.webGL = new GLShaderFFT(this.canvas);
-			this.webGPU = new WebGPU();
-			this.initializeEventListener();
+		if (!this.canvas) {
+			throw new Error('Not found canvas element.');
 		}
+
+		this.canvas.width = this.canvas.clientWidth;
+		this.canvas.height = this.canvas.clientHeight;
+		this.initializeEventListener();
+
+		// this.webGL = new GLShaderFFT(this.canvas);
+		this.webGPU = new WebGPU();
 	}
 
-	protected initializeEventListener(): boolean {
-		if (!this.canvas || !this.webGL) {
-			return false;
+	protected initializeEventListener(): void {
+		if (!this.canvas) {
+			throw new Error('Not exist canvas element');
 		}
 
 		let view = Scene.viewPosition;
@@ -79,18 +81,20 @@ export class Canvas {
 			glm.vec3.add(view, view, zoomVec);
 			Scene.viewPosition = view;
 		});
-
-		return true;
 	}
 
 	public async initializeRenderingContexts(): Promise<void> {
-		if ((this.canvas && this, this.webGPU)) {
-			await this.webGPU.initializeWebGPUContexts(this.canvas as HTMLCanvasElement);
-			this.webGPU.initializeShader();
+		if (!this.canvas) {
+			throw new Error('Not found canvas element.');
 		}
-
+		
+		/*
 		if (this.webGL) {
 			this.webGL.preUpdate();
+		}*/
+
+		if (this.webGPU) {
+			await this.webGPU.initializeContexts(this.canvas);
 		}
 	}
 
@@ -99,6 +103,7 @@ export class Canvas {
 		if (this.webGL) {
 			this.webGL.update(deltaTime);
 		}*/
+
 		if (this.webGPU) {
 			this.webGPU.draw();
 		}
