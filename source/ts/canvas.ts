@@ -15,7 +15,6 @@ export class Canvas {
 
 	protected canvas: HTMLCanvasElement | null = null;
 	protected bMouseOn: boolean = false;
-	protected bUpdate: boolean = true;
 
 	protected construct(canvasID: string): void {
 		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
@@ -46,38 +45,50 @@ export class Canvas {
 			}
 		});
 
-		this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
+		this.canvas.addEventListener('mousedown', () => {
 			this.bMouseOn = true;
-			if (e.button == 1) {
-				this.bUpdate = this.bUpdate ? false : true;
-			}
 		});
-
 		this.canvas.addEventListener('mouseup', () => {
 			this.bMouseOn = false;
 		});
+		window.addEventListener('mousedown', () => {
+			this.bMouseOn = true;
+		});
+		window.addEventListener('mouseup', () => {
+			this.bMouseOn = false;
+		});
 
-		this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+		window.addEventListener('mousemove', (e: MouseEvent) => {
 			if (this.bMouseOn) {
-				// TODO: support every up vector
-				const ROTATE_MAGNITUDE: number = 0.005;
-				const rotateSizeX = -e.movementX * ROTATE_MAGNITUDE;
-				view = glm.vec3.rotateZ(glm.vec3.create(), view, glm.vec3.create(), rotateSizeX);
-				// TODO: support mouse Y move rotate
-
-				// temp Y movement(not orbital rotate)
-				const MOVEMENT_MAGNITUDE: number = 0.01;
-				view[2] += e.movementY * MOVEMENT_MAGNITUDE;
+				// X
+				const X_MAG: number = 0.005;
+				const Xrotate: glm.mat4 = glm.mat4.rotate(
+					glm.mat4.create(),
+					glm.mat4.create(),
+					-e.movementX * X_MAG,
+					Scene.viewUp
+				);
+				view = glm.vec3.transformMat4(view, view, Xrotate);
+				// Y
+				const Y_MAG: number = 0.005;
+				const Yaxis: glm.vec3 = glm.vec3.cross(glm.vec3.create(), Scene.viewUp, view);
+				const Yrotate: glm.mat4 = glm.mat4.rotate(
+					glm.mat4.create(),
+					glm.mat4.create(),
+					-e.movementY * Y_MAG,
+					Yaxis
+				);
+				view = glm.vec3.transformMat4(view, view, Yrotate);
 				Scene.viewPosition = view;
 			}
 		});
 
 		this.canvas.addEventListener('wheel', (e: WheelEvent) => {
-			const ZOOM_MAGNITUDE: number = 0.01;
+			const ZOOM_MAG: number = 0.002;
 			let zoomBasis: glm.vec3 = glm.vec3.subtract(glm.vec3.create(), lookat, view);
 			zoomBasis = glm.vec3.normalize(zoomBasis, zoomBasis);
 			let zoomVec: glm.vec3 = glm.vec3.multiply(glm.vec3.create(), zoomBasis, glm.vec3.create().fill(-e.deltaY));
-			zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAGNITUDE));
+			zoomVec = glm.vec3.multiply(zoomVec, zoomVec, glm.vec3.create().fill(ZOOM_MAG));
 			glm.vec3.add(view, view, zoomVec);
 			Scene.viewPosition = view;
 		});
@@ -87,7 +98,7 @@ export class Canvas {
 		if (!this.canvas) {
 			throw new Error('Not found canvas element.');
 		}
-		
+
 		/*
 		if (this.webGL) {
 			this.webGL.preUpdate();
