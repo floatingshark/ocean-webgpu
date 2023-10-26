@@ -1,6 +1,12 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
 
+export class Uniform{
+	public world: glm.mat4 = glm.mat4.create();
+	public view: glm.mat4 = glm.mat4.create();
+	public projection: glm.mat4 = glm.mat4.create();
+}
+
 export class Material {
 	constructor() {}
 
@@ -128,6 +134,39 @@ export class Material {
 				},
 			],
 		});
+	}
+
+	public update(device: GPUDevice, uniform: Uniform) {
+		if(!this.uniformBuffer){
+			throw new Error('Uniform buffer is not initialized');
+		}
+
+		const worldMatrix: Float32Array = uniform.world as Float32Array;
+		device.queue.writeBuffer(
+			this.uniformBuffer,
+			4 * 16 * 0,
+			worldMatrix.buffer,
+			worldMatrix.byteOffset,
+			worldMatrix.byteLength
+		);
+
+		const viewMatrix: Float32Array = uniform.view as Float32Array;
+		device.queue.writeBuffer(
+			this.uniformBuffer,
+			4 * 16 * 1,
+			viewMatrix.buffer,
+			viewMatrix.byteOffset,
+			viewMatrix.byteLength
+		);
+
+		const projectionMatrix: Float32Array = uniform.projection as Float32Array;
+		device.queue.writeBuffer(
+			this.uniformBuffer,
+			4 * 16 * 2,
+			projectionMatrix.buffer,
+			projectionMatrix.byteOffset,
+			projectionMatrix.byteLength
+		);
 	}
 
 	public drawCommand(pass: GPURenderPassEncoder): void {

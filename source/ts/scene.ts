@@ -41,5 +41,9 @@ export class Scene {
 
 		Scene.time += deltaTime;
 		Scene.deltaTime = deltaTime;
+
+		for (const object of Scene.objects) {
+			object.update();
+		}
 	}
 }

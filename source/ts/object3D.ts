@@ -1,5 +1,6 @@
 import * as ShaderAPI from '@ts/shaderAPI';
-import { Material } from '@ts/material';
+import { Material, Uniform } from '@ts/material';
+import { Scene } from './scene';
 
 export class Object3D {
 	costructor() {
@@ -14,24 +15,23 @@ export class Object3D {
 	protected indexArray: Int32Array = ShaderAPI.MESH_2D_INDEX_ARRAY_TYPE;
 
 	public material: Material = new Material();
+	private device: GPUDevice | null = null;
+	private canvasFormat: GPUTextureFormat | null = null;
 
 	protected construct() {}
 
 	public initializeMaterial(device: GPUDevice, canvasFormat: GPUTextureFormat) {
-		this.material.initialize(device, canvasFormat, this.vertexArray, this.indexArray);
+		this.device = device;
+		this.canvasFormat = canvasFormat;
+		this.material.initialize(this.device, this.canvasFormat, this.vertexArray, this.indexArray);
 	}
 
-	public update(): void {}
-
-	public setPosition(inPos: number[]) {
-		this.position = inPos;
-	}
-
-	public setRotation(inRot: number[]) {
-		this.rotation = inRot;
-	}
-
-	public setScale(inScl: number[]) {
-		this.scale = inScl;
+	public update(): void {
+		if (this.device) {
+			const uniform: Uniform = new Uniform();
+			uniform.view = Scene.viewMatrix;
+			uniform.projection = Scene.projectionMatrix;
+			this.material.update(this.device, uniform);
+		}
 	}
 }

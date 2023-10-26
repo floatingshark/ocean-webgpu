@@ -5,8 +5,8 @@ import { Scene } from '@ts/scene';
 const canvas: Canvas = new Canvas('canvas');
 
 // initialize
+Scene.initialize();
 if (canvas) {
-	Scene.initialize();
 	await canvas.initializeRenderingContexts();
 	for (const object of Scene.getObjects()) {
 		object.initializeMaterial(canvas.webGPU?.device as GPUDevice, canvas.webGPU?.canvasFormat as GPUTextureFormat);
