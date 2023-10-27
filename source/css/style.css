@@ -17,6 +17,7 @@ body {
   color: white;
   padding-top: 6vh;
   padding-bottom: 3vh;
+  user-select: none;
 }
 
 .body-container {
@@ -45,11 +46,12 @@ body {
 .body-right-wrapper {
   text-align: left;
   font-size: 1.3em;
-  padding-left: 2vw;
+  padding-left: 3vw;
 }
 
 .footer {
   text-align: center;
   font-size: 1.2em;
   padding-top: 5vh;
+  user-select: none;
 }
