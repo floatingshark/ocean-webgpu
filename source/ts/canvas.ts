@@ -17,7 +17,7 @@ export class Canvas {
 	protected bMouseOn: boolean = false;
 
 	protected construct(canvasID: string): void {
-		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement | null;
+		this.canvas = document.getElementById(canvasID) as HTMLCanvasElement;
 		if (!this.canvas) {
 			throw new Error('Not found canvas element.');
 		}

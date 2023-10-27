@@ -1,12 +1,14 @@
 import '@css/style.css';
-import { Canvas } from '@ts/canvas';
 import { Scene } from '@ts/scene';
+import { Canvas } from '@ts/canvas';
+import {GUI} from '@ts/gui';
 
 const canvas: Canvas = new Canvas('canvas');
+const gui: GUI = new GUI();
 
 // initialize
-Scene.initialize();
 if (canvas) {
+	Scene.initialize();
 	await canvas.initializeRenderingContexts();
 	for (const object of Scene.getObjects()) {
 		object.initializeMaterial(canvas.webGPU?.device as GPUDevice, canvas.webGPU?.canvasFormat as GPUTextureFormat);
@@ -28,4 +30,5 @@ while (canvas) {
 
 	Scene.update(deltaTime);
 	canvas.update();
+	gui.update();
 }

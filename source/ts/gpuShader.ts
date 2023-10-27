@@ -1,18 +1,19 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
 
-export class Uniform{
+export class Uniform {
 	public world: glm.mat4 = glm.mat4.create();
 	public view: glm.mat4 = glm.mat4.create();
 	public projection: glm.mat4 = glm.mat4.create();
 }
 
-export class Material {
+export class gpuShader {
 	constructor() {}
 
 	protected vertexBuffer: GPUBuffer | null = null;
 	protected vertexBufferLayout: GPUVertexBufferLayout = { arrayStride: 0, attributes: [] };
 	protected indexBuffer: GPUBuffer | null = null;
+	protected indexLength: number = 0;
 	protected uniformBuffer: GPUBuffer | null = null;
 	protected bindGroup: GPUBindGroup | null = null;
 	protected shaderModule: GPUShaderModule | null = null;
@@ -83,6 +84,8 @@ export class Material {
 			],
 		};
 
+		this.indexLength = indexArray.length;
+
 		this.shaderModule = device.createShaderModule({
 			label: 'Cell shader',
 			code: ` struct Uniforms {
@@ -137,7 +140,7 @@ export class Material {
 	}
 
 	public update(device: GPUDevice, uniform: Uniform) {
-		if(!this.uniformBuffer){
+		if (!this.uniformBuffer) {
 			throw new Error('Uniform buffer is not initialized');
 		}
 
@@ -175,7 +178,7 @@ export class Material {
 			pass.setBindGroup(0, this.bindGroup);
 			pass.setVertexBuffer(0, this.vertexBuffer);
 			pass.setIndexBuffer(this.indexBuffer, 'uint32');
-			pass.drawIndexed(6);
+			pass.drawIndexed(this.indexLength);
 		}
 	}
 }

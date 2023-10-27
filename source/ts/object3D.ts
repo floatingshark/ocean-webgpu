@@ -1,5 +1,5 @@
 import * as ShaderAPI from '@ts/shaderAPI';
-import { Material, Uniform } from '@ts/material';
+import { gpuShader, Uniform } from '@ts/gpuShader';
 import { Scene } from './scene';
 
 export class Object3D {
@@ -11,10 +11,10 @@ export class Object3D {
 	protected rotation: number[] = [0.0, 0.0, 0.0];
 	protected scale: number[] = [0.0, 0.0, 0.0];
 
-	protected vertexArray: Float32Array = ShaderAPI.MESH_2D_VERTICE_ARRAY_TYPE;
-	protected indexArray: Int32Array = ShaderAPI.MESH_2D_INDEX_ARRAY_TYPE;
+	protected vertexArray: Float32Array = ShaderAPI.Plane.vertexArray;
+	protected indexArray: Int32Array = ShaderAPI.Plane.indexArray;
 
-	public material: Material = new Material();
+	public gpuShader: gpuShader = new gpuShader();
 	private device: GPUDevice | null = null;
 	private canvasFormat: GPUTextureFormat | null = null;
 
@@ -23,7 +23,7 @@ export class Object3D {
 	public initializeMaterial(device: GPUDevice, canvasFormat: GPUTextureFormat) {
 		this.device = device;
 		this.canvasFormat = canvasFormat;
-		this.material.initialize(this.device, this.canvasFormat, this.vertexArray, this.indexArray);
+		this.gpuShader.initialize(this.device, this.canvasFormat, this.vertexArray, this.indexArray);
 	}
 
 	public update(): void {
@@ -31,7 +31,7 @@ export class Object3D {
 			const uniform: Uniform = new Uniform();
 			uniform.view = Scene.viewMatrix;
 			uniform.projection = Scene.projectionMatrix;
-			this.material.update(this.device, uniform);
+			this.gpuShader.update(this.device, uniform);
 		}
 	}
 }

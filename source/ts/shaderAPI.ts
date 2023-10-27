@@ -112,7 +112,7 @@ export function encodeFloatToRGBA(inFloat: number): number[] {
 	return [r, g, b, a];
 }
 
-/** Mesh Datum ================================= */
+/** Geometory Data ================================= */
 
 // prettier-ignore
 export const MESH_PLANE_VERTICE: number[][] = [
@@ -136,24 +136,83 @@ export const MESH_PLANE_INDEX: number[][] = [
   [0, 2, 3]
 ];
 
-// prettier-ignore
-export const MESH_2D_VERTICE_ARRAY_TYPE: Float32Array = new Float32Array([
-	-1.0, -1.0, 0.0,
-	-1.0, 1.0, 0.0,
-	1.0, 1.0, 0.0,
-	1.0, -1.0, 0.0,
-]);
+export class Plane {
+	// prettier-ignore
+	static vertexArray: Float32Array = new Float32Array([
+		-1.0, -1.0, 0.0,
+		-1.0, 1.0, 0.0,
+		1.0, 1.0, 0.0,
+		1.0, -1.0, 0.0,
+	]);
+	// prettier-ignore
+	static colorArray: Float32Array = new Float32Array([
+		1.0, 0.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		1.0, 1.0, 1.0, 1.0,
+	]);
+	// prettier-ignore
+	static indexArray: Int32Array = new Int32Array([
+		0, 1, 2, 
+		0, 2, 3
+	  ]);
+}
 
-// prettier-ignore
-export const MESH_2D_COLOR_ARRAY_TYPE: Float32Array = new Float32Array([
-	1.0, 0.0, 0.0, 1.0,
-	0.0, 1.0, 0.0, 1.0,
-	0.0, 0.0, 1.0, 1.0,
-	1.0, 1.0, 1.0, 1.0,
-]);
+export class Cube {
+	// prettier-ignore
+	static vertexArray: Float32Array = new Float32Array([
+		// Left
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0, 1.0,
+		-1.0, 1.0, 1.0,
+		-1.0, 1.0, -1.0,
+		// Back
+		1.0, -1.0, -1.0,
+		-1.0, -1.0, -1.0,
+		-1.0, 1.0, -1.0,
+		1.0, 1.0, -1.0,
+		// Bottom
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, -1.0, 1.0,
+		-1.0, -1.0, 1.0,
+		// Right
+		1.0, -1.0, 1.0,
+		1.0, -1.0, -1.0,
+		1.0, 1.0, -1.0,
+		1.0, 1.0, 1.0,
+		// Top
+		-1.0, 1.0, -1.0,
+		-1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0, -1.0,
+		// Front
+		-1.0, -1.0, 1.0,
+		1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0,
+		-1.0, 1.0, 1.0
+	
+	]);
 
-// prettier-ignore
-export const MESH_2D_INDEX_ARRAY_TYPE: Int32Array = new Int32Array([
-  0, 1, 2, 
-  0, 2, 3
-]);
+	// prettier-ignore
+	static indexArray: Int32Array = new Int32Array([
+		// Left
+		0, 1, 2,
+		0, 2, 3,
+		// Back
+		4, 5, 6,
+		4, 6, 7,
+		// Bottom
+		8, 9, 10,
+		8, 10, 11,
+		// Right
+		12, 13, 14,
+		12, 14, 15,
+		// Up
+		16, 17, 18,
+		16, 18, 19,
+		// Front
+		20, 21, 22,
+		20, 22, 23
+	]);
+}

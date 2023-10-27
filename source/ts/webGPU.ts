@@ -54,7 +54,7 @@ export class WebGPU {
 			});
 
 			for (const object of Scene.getObjects()) {
-				object.material.drawCommand(pass);
+				object.gpuShader.drawCommand(pass);
 			}
 
 			pass.end();
