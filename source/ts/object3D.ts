@@ -1,6 +1,5 @@
 import * as ShaderAPI from '@ts/shaderAPI';
-import { gpuShader, Uniform } from '@ts/gpuShader';
-import { Scene } from './scene';
+import { gpuShader} from '@ts/gpuShader';
 
 export class Object3D {
 	costructor() {
@@ -28,10 +27,7 @@ export class Object3D {
 
 	public update(): void {
 		if (this.device) {
-			const uniform: Uniform = new Uniform();
-			uniform.view = Scene.viewMatrix;
-			uniform.projection = Scene.projectionMatrix;
-			this.gpuShader.update(this.device, uniform);
+			this.gpuShader.update(this.device);
 		}
 	}
 }

@@ -155,7 +155,7 @@ export class GLShaderFFT extends GLShader {
 
 		function gauss(): number[] {
 			const ret: number[] = [0.0, 0.0];
-			ShaderAPI.generateGaussianRandom([Math.random(), Math.random()], ret);
+			ShaderAPI.getGaussianRandom([Math.random(), Math.random()], ret);
 			// ret[0] = Math.abs(ret[0]);
 			// ret[1] = Math.abs(ret[1]);
 			return ret;

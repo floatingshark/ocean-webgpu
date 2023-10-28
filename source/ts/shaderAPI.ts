@@ -47,7 +47,7 @@ export function createWebGLProgram(
 	return program;
 }
 
-/** Generate Functions ====================== */
+/** Snippets ====================== */
 
 export function generateSubdividedMesh2d(
 	size: number,
@@ -87,7 +87,7 @@ export function generateSubdividedMesh2d(
 	return;
 }
 
-export function generateGaussianRandom(seed: number[], out: number[]) {
+export function getGaussianRandom(seed: number[], out: number[]) : void {
 	if (seed.length > 1 && out.length > 0) {
 		const log = -2.0 * Math.log(seed[0]);
 		const R = log <= 0.0 ? 0.0 : Math.sqrt(log);

@@ -1,7 +1,7 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
 
-export class Uniform {
+export class UniformMVP {
 	public world: glm.mat4 = glm.mat4.create();
 	public view: glm.mat4 = glm.mat4.create();
 	public projection: glm.mat4 = glm.mat4.create();
@@ -14,7 +14,7 @@ export class gpuShader {
 	protected vertexBufferLayout: GPUVertexBufferLayout = { arrayStride: 0, attributes: [] };
 	protected indexBuffer: GPUBuffer | null = null;
 	protected indexLength: number = 0;
-	protected uniformBuffer: GPUBuffer | null = null;
+	protected uniformBufferMVP: GPUBuffer | null = null;
 	protected bindGroup: GPUBindGroup | null = null;
 	protected shaderModule: GPUShaderModule | null = null;
 	protected pipeline: GPURenderPipeline | null = null;
@@ -37,9 +37,9 @@ export class gpuShader {
 			usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
 		});
 
-		const uniformBufferSize: number = 4 * 16 * 3;
-		this.uniformBuffer = device.createBuffer({
-			size: uniformBufferSize,
+		const uniformBufferMVPSize: number = 4 * 16 * 3;
+		this.uniformBufferMVP = device.createBuffer({
+			size: uniformBufferMVPSize,
 			usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
 		});
 
@@ -48,7 +48,7 @@ export class gpuShader {
 
 		const worldMatrix: Float32Array = glm.mat4.create() as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 0,
 			worldMatrix.buffer,
 			worldMatrix.byteOffset,
@@ -57,7 +57,7 @@ export class gpuShader {
 
 		const viewMatrix: Float32Array = Scene.viewMatrix as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 1,
 			viewMatrix.buffer,
 			viewMatrix.byteOffset,
@@ -66,7 +66,7 @@ export class gpuShader {
 
 		const projectionMatrix: Float32Array = Scene.projectionMatrix as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 2,
 			projectionMatrix.buffer,
 			projectionMatrix.byteOffset,
@@ -132,21 +132,25 @@ export class gpuShader {
 				{
 					binding: 0,
 					resource: {
-						buffer: this.uniformBuffer,
+						buffer: this.uniformBufferMVP,
 					},
 				},
 			],
 		});
 	}
 
-	public update(device: GPUDevice, uniform: Uniform) {
-		if (!this.uniformBuffer) {
+	public update(device: GPUDevice) {
+		if (!this.uniformBufferMVP) {
 			throw new Error('Uniform buffer is not initialized');
 		}
 
+		const uniform: UniformMVP = new UniformMVP();
+		uniform.view = Scene.viewMatrix;
+		uniform.projection = Scene.projectionMatrix;
+
 		const worldMatrix: Float32Array = uniform.world as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 0,
 			worldMatrix.buffer,
 			worldMatrix.byteOffset,
@@ -155,7 +159,7 @@ export class gpuShader {
 
 		const viewMatrix: Float32Array = uniform.view as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 1,
 			viewMatrix.buffer,
 			viewMatrix.byteOffset,
@@ -164,7 +168,7 @@ export class gpuShader {
 
 		const projectionMatrix: Float32Array = uniform.projection as Float32Array;
 		device.queue.writeBuffer(
-			this.uniformBuffer,
+			this.uniformBufferMVP,
 			4 * 16 * 2,
 			projectionMatrix.buffer,
 			projectionMatrix.byteOffset,
