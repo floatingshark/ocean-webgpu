@@ -1,5 +1,6 @@
 import * as ShaderAPI from '@ts/shaderAPI';
-import { gpuShader} from '@ts/gpuShader';
+//import { gpuShader} from '@ts/gpuShader';
+import { gpuShaderFFT } from './gpuShaderFFT';
 
 export class Object3D {
 	costructor() {
@@ -13,7 +14,7 @@ export class Object3D {
 	protected vertexArray: Float32Array = ShaderAPI.Plane.vertexArray;
 	protected indexArray: Int32Array = ShaderAPI.Plane.indexArray;
 
-	public gpuShader: gpuShader = new gpuShader();
+	public gpuShader: gpuShaderFFT = new gpuShaderFFT();
 	private device: GPUDevice | null = null;
 	private canvasFormat: GPUTextureFormat | null = null;
 

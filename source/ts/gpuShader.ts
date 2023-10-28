@@ -88,16 +88,16 @@ export class gpuShader {
 
 		this.shaderModule = device.createShaderModule({
 			label: 'Cell shader',
-			code: ` struct Uniforms {
+			code: ` struct UniformsMVP {
 						worldMatrix : mat4x4<f32>,
 						viewMatrix : mat4x4<f32>,
 						projectionMatrix : mat4x4<f32>
 			 	 	}
-					@binding(0) @group(0) var<uniform> uniforms : Uniforms;
+					@binding(0) @group(0) var<uniform> uniformsMVP : UniformsMVP;
 
 					@vertex
 					fn vertexMain(@location(0) pos: vec3f) -> @builtin(position) vec4f {
-						return uniforms.projectionMatrix * uniforms.viewMatrix * uniforms.worldMatrix * vec4f(pos * 0.8, 1);
+						return uniformsMVP.projectionMatrix * uniformsMVP.viewMatrix * uniformsMVP.worldMatrix * vec4f(pos * 0.8, 1);
 					}
 
 					@fragment

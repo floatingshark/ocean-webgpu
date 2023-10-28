@@ -34,7 +34,6 @@ export class GLShaderFFT extends GLShader {
 	protected uniformLocationTexH0Re: WebGLUniformLocation | null = null;
 	protected uniformLocationTexH0Im: WebGLUniformLocation | null = null;
 
-	protected textureH0: WebGLTexture | null = null;
 	protected textureH0Re: WebGLTexture | null = null;
 	protected textureH0Im: WebGLTexture | null = null;
 
