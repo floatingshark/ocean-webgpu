@@ -1,16 +1,12 @@
 import * as glm from 'gl-matrix';
 import { Scene } from '@ts/scene';
-import { GLShader } from '@ts/glShader';
 import { WebGPU } from './webGPU';
-
-// import { GLShaderFFT } from '@ts/glShaderFFT';
 
 export class Canvas {
 	constructor(canvasID: string) {
 		this.construct(canvasID);
 	}
 
-	public webGL: GLShader | null = null;
 	public webGPU: WebGPU | null = null;
 
 	protected canvas: HTMLCanvasElement | null = null;
@@ -25,8 +21,6 @@ export class Canvas {
 		this.canvas.width = this.canvas.clientWidth;
 		this.canvas.height = this.canvas.clientHeight;
 		this.initializeEventListener();
-
-		// this.webGL = new GLShaderFFT(this.canvas);
 		this.webGPU = new WebGPU();
 	}
 
@@ -110,13 +104,8 @@ export class Canvas {
 	}
 
 	public update(): void {
-		/*
-		if (this.webGL) {
-			this.webGL.update(deltaTime);
-		}*/
-
 		if (this.webGPU) {
-			this.webGPU.draw();
+			this.webGPU.update();
 		}
 	}
 }

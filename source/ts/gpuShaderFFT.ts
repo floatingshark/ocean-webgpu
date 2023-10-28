@@ -4,13 +4,11 @@ import { gpuShader } from './gpuShader';
 
 export class UniformFFT {
 	public time: number = 0.0;
-	public N: number = 64;
+	public N: number = 256;
 	public A: number = 50.0;
 	public T: number = 200.0;
 	public f: number = 1.0;
 	public phi: number = 50000;
-	public h0re: ImageData = new ImageData(this.N, this.N);
-	public h0im: ImageData = new ImageData(this.N, this.N);
 }
 
 export class gpuShaderFFT extends gpuShader {
@@ -20,9 +18,13 @@ export class gpuShaderFFT extends gpuShader {
 
 	protected uniformFFT: UniformFFT = new UniformFFT();
 	protected uniformBufferFFT: GPUBuffer | null = null;
-	protected sampler: GPUSampler | null = null;
-	protected textureH0re: GPUTexture | null = null;
-	protected textureH0im: GPUTexture | null = null;
+
+	protected h0Array: Float32Array = new Float32Array(2 * this.uniformFFT.N * this.uniformFFT.N);
+	protected h0Buffer: GPUBuffer | null = null;
+	protected htBuffer: GPUBuffer | null = null;
+	protected computeModule: GPUShaderModule | null = null;
+	protected computePipeline: GPUComputePipeline | null = null;
+	protected computeBindGroup: GPUBindGroup | null = null;
 
 	override initialize(
 		device: GPUDevice,
@@ -32,6 +34,7 @@ export class gpuShaderFFT extends gpuShader {
 	): void {
 		super.initialize(device, canvasFormat, vertexArray, indexArray);
 		this.initializeH0();
+		this.initializeComputeShader(device);
 
 		if (this.uniformFFT) {
 			const uniformBufferFFTSize: number = 4 * 6;
@@ -46,30 +49,6 @@ export class gpuShaderFFT extends gpuShader {
 			device.queue.writeBuffer(this.uniformBufferFFT, 12, new Float32Array([this.uniformFFT.T]));
 			device.queue.writeBuffer(this.uniformBufferFFT, 16, new Float32Array([this.uniformFFT.f]));
 			device.queue.writeBuffer(this.uniformBufferFFT, 20, new Float32Array([this.uniformFFT.phi]));
-
-			this.sampler = device.createSampler({
-				magFilter: 'linear',
-				minFilter: 'linear',
-			});
-
-			this.textureH0re = device.createTexture({
-				size: [this.uniformFFT.N, this.uniformFFT.N, 1],
-				format: 'rgba8unorm',
-				usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-			});
-			device.queue.copyExternalImageToTexture({ source: this.uniformFFT.h0re }, { texture: this.textureH0re }, [
-				this.uniformFFT.N,
-				this.uniformFFT.N,
-			]);
-			this.textureH0im = device.createTexture({
-				size: [this.uniformFFT.N, this.uniformFFT.N, 1],
-				format: 'rgba8unorm',
-				usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-			});
-			device.queue.copyExternalImageToTexture({ source: this.uniformFFT.h0im }, { texture: this.textureH0im }, [
-				this.uniformFFT.N,
-				this.uniformFFT.N,
-			]);
 		}
 
 		this.shaderModule = device.createShaderModule({
@@ -137,19 +116,7 @@ export class gpuShaderFFT extends gpuShader {
 						resource: {
 							buffer: this.uniformBufferFFT,
 						},
-					}/*,
-					{
-						binding: 2,
-						resource: this.textureH0re.createView(),
 					},
-					{
-						binding: 3,
-						resource: this.textureH0im.createView(),
-					},
-					{
-						binding: 4,
-						resource: this.sampler,
-					},*/,
 				],
 			});
 		}
@@ -158,12 +125,58 @@ export class gpuShaderFFT extends gpuShader {
 	override update(device: GPUDevice) {
 		super.update(device);
 
-		if(!this.uniformBufferFFT){
+		if (!this.uniformBufferFFT) {
 			throw new Error('Not exist FFT uniform buffer');
 		}
 
 		this.uniformFFT.time = Scene.time;
 		device.queue.writeBuffer(this.uniformBufferFFT, 0, new Float32Array([this.uniformFFT.time]));
+	}
+
+	override computeCommand(computePass: GPUComputePassEncoder): void {
+		if (!this.computePipeline) {
+			throw new Error('Not exist compute shader contexts');
+		}
+
+		computePass.setPipeline(this.computePipeline);
+		computePass.setBindGroup(0, this.computeBindGroup);
+		const workgroupSize = 4;
+		computePass.dispatchWorkgroups(this.h0Array.length / workgroupSize);
+	}
+
+	override drawCommand(pass: GPURenderPassEncoder): void {
+		super.drawCommand(pass);
+	}
+
+	override postCommand(device: GPUDevice): void {
+		super.postCommand(device);
+		
+		if (!this.htBuffer) {
+			throw new Error('Not exist ht buffer');
+		}
+
+		const stagingBuffer = device.createBuffer({
+			mappedAtCreation: false,
+			size: 4 * this.h0Array.length,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+		});
+
+		const copyEncoder = device.createCommandEncoder();
+		copyEncoder.copyBufferToBuffer(this.htBuffer, 0, stagingBuffer, 0, 4 * this.h0Array.length);
+		const copyCommands = copyEncoder.finish();
+		device.queue.submit([copyCommands]);
+
+		/*
+		stagingBuffer
+			.mapAsync(GPUMapMode.READ)
+			.then(() => {
+				const copyArrayBuffer = stagingBuffer.getMappedRange();
+				console.log(new Float32Array(copyArrayBuffer)); // [2, 4, 6, 8]
+				stagingBuffer.unmap();
+			})
+			.catch((e) => {
+				console.log(e);
+			});*/
 	}
 
 	private initializeH0(): void {
@@ -214,19 +227,64 @@ export class gpuShaderFFT extends gpuShader {
 				h0_i[0] = (gaussRand[0] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
 				h0_i[1] = (gaussRand[1] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
 
-				const imageDataIndex: number = (x + y * N) * 4;
-				const reRGBA: number[] = ShaderAPI.encodeFloatToRGBA(h0_i[0]);
-				this.uniformFFT.h0re.data[imageDataIndex] = reRGBA[0];
-				this.uniformFFT.h0re.data[imageDataIndex + 1] = reRGBA[1];
-				this.uniformFFT.h0re.data[imageDataIndex + 2] = reRGBA[2];
-				this.uniformFFT.h0re.data[imageDataIndex + 3] = reRGBA[3];
-
-				const imRGBA: number[] = ShaderAPI.encodeFloatToRGBA(h0_i[1]);
-				this.uniformFFT.h0im.data[imageDataIndex] = imRGBA[0];
-				this.uniformFFT.h0im.data[imageDataIndex + 1] = imRGBA[1];
-				this.uniformFFT.h0im.data[imageDataIndex + 2] = imRGBA[2];
-				this.uniformFFT.h0im.data[imageDataIndex + 3] = imRGBA[3];
+				this.h0Array[y * N + x] = h0_i[0];
+				this.h0Array[y * N + x + 1] = h0_i[1];
 			}
 		}
+	}
+
+	private initializeComputeShader(device: GPUDevice) {
+		{
+			this.h0Buffer = device.createBuffer({
+				size: this.h0Array.byteLength,
+				usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+			});
+
+			device.queue.writeBuffer(this.h0Buffer, 0, this.h0Array);
+
+			this.htBuffer = device.createBuffer({
+				size: this.h0Array.byteLength,
+				usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+			});
+		}
+
+		this.computeModule = device.createShaderModule({
+			code: `
+			  struct Input {
+				data: array<f32>,
+			  };
+		
+			  struct Output {
+				data: array<f32>,
+			  };
+		
+			  @group(0) @binding(0)
+			  var<storage, read> input : Input;
+		
+			  @group(0) @binding(1)
+			  var<storage, read_write> output : Output;
+		
+			  @compute @workgroup_size(4)
+			  fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+				output.data[global_id.x] = input.data[global_id.x] * 2.0;
+			  }
+			`,
+		});
+
+		this.computePipeline = device.createComputePipeline({
+			layout: 'auto',
+			compute: {
+				module: this.computeModule,
+				entryPoint: 'main',
+			},
+		});
+
+		this.computeBindGroup = device.createBindGroup({
+			layout: this.computePipeline.getBindGroupLayout(0),
+			entries: [
+				{ binding: 0, resource: { buffer: this.h0Buffer } },
+				{ binding: 1, resource: { buffer: this.htBuffer } },
+			],
+		});
 	}
 }

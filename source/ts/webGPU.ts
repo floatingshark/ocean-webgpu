@@ -32,12 +32,22 @@ export class WebGPU {
 		});
 	}
 
-	public draw(): void {
+	public update(): void {
 		if (!this.device) {
 			throw new Error('Not exist device');
 		}
 		if (!this.context) {
 			throw new Error('Not exist context');
+		}
+
+		const computeEncoder: GPUCommandEncoder = this.device.createCommandEncoder();
+		if (computeEncoder) {
+			const computePass: GPUComputePassEncoder = computeEncoder.beginComputePass();
+			for (const object of Scene.getObjects()) {
+				object.gpuShader.computeCommand(computePass);
+			}
+			computePass.end();
+			this.device.queue.submit([computeEncoder.finish()]);
 		}
 
 		const encoder: GPUCommandEncoder = this.device.createCommandEncoder();
@@ -52,15 +62,17 @@ export class WebGPU {
 					},
 				],
 			});
-
 			for (const object of Scene.getObjects()) {
 				object.gpuShader.drawCommand(pass);
 			}
-
 			pass.end();
 
 			const commandBuffer = encoder.finish();
 			this.device.queue.submit([commandBuffer]);
+		}
+
+		for (const object of Scene.getObjects()) {
+			object.gpuShader.postCommand(this.device);
 		}
 	}
 }

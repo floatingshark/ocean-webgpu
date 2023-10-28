@@ -176,6 +176,9 @@ export class gpuShader {
 		);
 	}
 
+	// eslint-disable-next-line
+	public computeCommand(computePass: GPUComputePassEncoder): void {}
+
 	public drawCommand(pass: GPURenderPassEncoder): void {
 		if (this.pipeline && this.vertexBuffer && this.indexBuffer) {
 			pass.setPipeline(this.pipeline);
@@ -185,4 +188,7 @@ export class gpuShader {
 			pass.drawIndexed(this.indexLength);
 		}
 	}
+
+	// eslint-disable-next-line
+	public postCommand(device: GPUDevice) {}
 }
