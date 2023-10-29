@@ -15,9 +15,9 @@ export class gpuShader {
 	protected indexBuffer: GPUBuffer | null = null;
 	protected indexLength: number = 0;
 	protected uniformBufferMVP: GPUBuffer | null = null;
-	protected bindGroup: GPUBindGroup | null = null;
 	protected shaderModule: GPUShaderModule | null = null;
 	protected pipeline: GPURenderPipeline | null = null;
+	protected bindGroup: GPUBindGroup | null = null;
 
 	public initialize(
 		device: GPUDevice,
