@@ -87,7 +87,7 @@ export function generateSubdividedMesh2d(
 	return;
 }
 
-export function getGaussianRandom(seed: number[], out: number[]) : void {
+export function getGaussianRandom(seed: number[], out: number[]): void {
 	if (seed.length > 1 && out.length > 0) {
 		const log = -2.0 * Math.log(seed[0]);
 		const R = log <= 0.0 ? 0.0 : Math.sqrt(log);
@@ -156,6 +156,40 @@ export class Plane {
 		0, 1, 2, 
 		0, 2, 3
 	  ]);
+
+	static subdividedVertexArray(division: number): Float32Array {
+		if (division < 2) {
+			return this.vertexArray;
+		}
+
+		const vertice: number[] = [];
+		for (let y: number = 0; y < division; y++) {
+			for (let x: number = 0; x < division; x++) {
+				const posx: number = -1.0 + x * (2.0 / (division - 1));
+				const posy: number = -1.0 + y * (2.0 / (division - 1));
+				vertice.push(posx, posy, 0.0);
+			}
+		}
+		return new Float32Array(vertice);
+	}
+
+	static subdividedIndexArray(division: number): Int32Array {
+		if (division < 2) {
+			return this.indexArray;
+		}
+
+		const indice: number[] = [];
+		for (let y: number = 0; y < division - 1; y++) {
+			for (let x: number = 0; x < division - 1; x++) {
+				const index_1: number = y * division + x;
+				const index_2: number = y * division + x + 1;
+				const index_3: number = (y + 1) * division + x;
+				const index_4: number = (y + 1) * division + x + 1;
+				indice.push(index_1, index_2, index_3, index_3, index_2, index_4);
+			}
+		}
+		return new Int32Array(indice);
+	}
 }
 
 export class Cube {
