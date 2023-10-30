@@ -51,7 +51,7 @@ export class gpuShaderFFT extends gpuShader {
 			});
 
 			device.queue.writeBuffer(this.uniformBufferFFT, 0, new Float32Array([this.uniformFFT.time]));
-			device.queue.writeBuffer(this.uniformBufferFFT, 4, new Float32Array([this.uniformFFT.N]));
+			device.queue.writeBuffer(this.uniformBufferFFT, 4, new Int32Array([this.uniformFFT.N]));
 			device.queue.writeBuffer(this.uniformBufferFFT, 8, new Float32Array([this.uniformFFT.A]));
 			device.queue.writeBuffer(this.uniformBufferFFT, 12, new Float32Array([this.uniformFFT.T]));
 		}
@@ -65,25 +65,44 @@ export class gpuShaderFFT extends gpuShader {
 			  		}
 					struct UniformsFFT {
 						time : f32,
-						N : f32,
+						N : u32,
 						A : f32,
 						T : f32,
+					}
+					struct VertexOutput {
+						@builtin(position) position : vec4<f32>,
+						@location(0) normal : vec4<f32>,
 					}
 					@group(0) @binding(0) var<uniform> uniformsMVP : UniformsMVP;
 					@group(0) @binding(1) var<uniform> uniformsFFT : UniformsFFT;
 					@group(0) @binding(2) var<storage> dz : array<f32>;
 
 					@vertex
-					fn vertexMain(@location(0) pos: vec3f, @builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
-						var position: vec4f = vec4f(pos, 1.0);
-						position.z = dz[i];
-						return uniformsMVP.projectionMatrix * uniformsMVP.viewMatrix * uniformsMVP.worldMatrix * position;
+					fn vertexMain(@location(0) pos: vec3f, @builtin(vertex_index) i: u32) -> VertexOutput {
+						var output: VertexOutput;
+						output.position   = vec4f(pos, 1.0);
+						output.position.z = dz[i];
+						output.position   = uniformsMVP.projectionMatrix * uniformsMVP.viewMatrix * uniformsMVP.worldMatrix * output.position;
+						
+						let N: u32    = uniformsFFT.N;
+						let x_id: u32 = i % N;
+						let y_id: u32 = i / N;
+						let x0: u32   = (x_id - 1 + N) % N;
+    					let x1: u32   = (x_id + 1) % N;
+						let y0: u32   = (y_id - 1 + N) % N;
+    					let y1: u32   = (y_id + 1) % N;
+						let subx : f32 = 0.5 * (dz[x1 + y_id * N] - dz[x0 + y_id * N]) * 100.0;
+    					let suby : f32 = 0.5 * (dz[x_id + y1 * N] - dz[x_id + y0 * N]) * 100.0;
+						let vec: vec3f = normalize(vec3f(-subx, -suby, 1.0));
+						output.normal = vec4f(vec, 1.0);
+
+						return output;
 					}
 
 					@fragment
-					fn fragmentMain() -> @location(0) vec4f {
-						let time = uniformsFFT.time;
-						return vec4f(0, 1.0, 1.0, 1);
+					fn fragmentMain(@location(0) normal: vec4f) -> @location(0) vec4f {
+						return normal;
+						//return vec4f(0, 1.0, 1.0, 1);
 					}
 					`,
 		});
