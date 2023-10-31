@@ -2,7 +2,7 @@ import * as glm from 'gl-matrix';
 import { Object3D } from './object3D';
 
 export class Scene {
-	static viewPosition: glm.vec3 = [-0.01, -0.17, 1.78];
+	static viewPosition: glm.vec3 = [-0.01, -0.57, 0.15];
 	static viewLookAt: glm.vec3 = [0.0, 0.0, 0.0];
 	static viewUp: glm.vec3 = [0.0, 0.0, 1.0];
 	static viewMatrix: glm.mat4 = glm.mat4.create();
