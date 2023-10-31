@@ -76,6 +76,7 @@ export class gpuShaderFFT extends gpuShader {
 					@group(0) @binding(0) var<uniform> uniformsMVP : UniformsMVP;
 					@group(0) @binding(1) var<uniform> uniformsFFT : UniformsFFT;
 					@group(0) @binding(2) var<storage> dz : array<f32>;
+					@group(0) @binding(3) var<storage> ht : array<f32>;
 
 					@vertex
 					fn vertexMain(@location(0) pos: vec3f, @builtin(vertex_index) i: u32) -> VertexOutput {
@@ -96,13 +97,24 @@ export class gpuShaderFFT extends gpuShader {
 						let vec: vec3f = normalize(vec3f(-subx, -suby, 1.0));
 						output.normal = vec4f(vec, 1.0);
 
+						let ht_i: f32 = ht[2 * i];
+						//output.normal = vec4f(ht[2 * i], ht[2 * i + 1], 0.0, 1.0) * 10000;	
+
 						return output;
 					}
 
 					@fragment
-					fn fragmentMain(@location(0) normal: vec4f) -> @location(0) vec4f {
+					fn fragmentMain(@builtin(position) position : vec4<f32>, @location(0) normal: vec4f) -> @location(0) vec4f {
+						let light: vec4f = vec4f(0.0, 0.0, 1.0, 1.0);
+						let view: vec4f  = vec4f(uniformsMVP.viewMatrix[3][0], uniformsMVP.viewMatrix[3][1], uniformsMVP.viewMatrix[3][2], 1.0);
+						let L: vec4f = light - position;
+						let V: vec4f = view - position;
+						let H: vec4f = normalize(L + V);
+						let diffuse: f32  = clamp(dot(normal, L), 0.0, 1.0);
+						let specular: f32 = pow(clamp(dot(normal, H), 0.0, 1.0), 1000.0);
+						let dest: vec4f   = vec4f(vec3f(diffuse), 1.0) + vec4f(vec3f(specular), 1.0) + vec4f(0.2, 0.2, 0.2, 1.0);
+						//return vec4f(0.0, 1.0, 1.0, 1.0) * dest;
 						return normal;
-						//return vec4f(0, 1.0, 1.0, 1);
 					}
 					`,
 		});
@@ -126,7 +138,7 @@ export class gpuShaderFFT extends gpuShader {
 			},
 		});
 
-		if (this.pipeline && this.uniformBufferMVP && this.uniformBufferFFT && this.storageBufferDz) {
+		if (this.pipeline && this.uniformBufferMVP && this.uniformBufferFFT && this.storageBufferDz && this.storageBufferHt && this.storageBufferH0) {
 			this.bindGroup = device.createBindGroup({
 				layout: this.pipeline.getBindGroupLayout(0),
 				entries: [
@@ -148,6 +160,12 @@ export class gpuShaderFFT extends gpuShader {
 							buffer: this.storageBufferDz,
 						},
 					},
+					{
+						binding: 3,
+						resource: {
+							buffer: this.storageBufferH0,
+						},
+					}
 				],
 			});
 		}
@@ -260,8 +278,8 @@ export class gpuShaderFFT extends gpuShader {
 			}
 
 			const G: number = 9.81;
-			const A: number = 0.00000001;
-			const windSpeed: number = 5.0;
+			const A: number = 0.000000001;
+			const windSpeed: number = 30.0;
 			const windDir: number = Math.PI * 1.234;
 
 			const k4mag: number = k2mag * k2mag;
@@ -291,8 +309,8 @@ export class gpuShaderFFT extends gpuShader {
 				h0_i[0] = (gaussRand[0] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
 				h0_i[1] = (gaussRand[1] * Math.sqrt(p * 0.5)) / Math.sqrt(2.0);
 
-				this.h0Array[y * N + x] = h0_i[0];
-				this.h0Array[y * N + x + 1] = h0_i[1];
+				this.h0Array[2 * (y * N + x)] = h0_i[0];
+				this.h0Array[2 * (y * N + x) + 1] = h0_i[1];
 			}
 		}
 	}
