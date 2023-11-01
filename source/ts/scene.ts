@@ -16,6 +16,9 @@ export class Scene {
 	static time: number = 0;
 	static deltaTime: number = 0;
 
+	static canvasWidth: number = 500;
+	static canvasHeight: number = 500;
+
 	static objects: Object3D[] = [];
 
 	public static initialize(): void {

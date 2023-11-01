@@ -7,6 +7,7 @@ export class WebGPU {
 	public device: GPUDevice | null = null;
 	public context: GPUCanvasContext | null = null;
 	public canvasFormat: GPUTextureFormat | null = null;
+	public depthTexture: GPUTexture | null = null;
 
 	public async initializeContexts(canvas: HTMLCanvasElement): Promise<void> {
 		if (!navigator.gpu) {
@@ -30,13 +31,19 @@ export class WebGPU {
 			device: this.device,
 			format: this.canvasFormat,
 		});
+
+		this.depthTexture = this.device.createTexture({
+			size: [Scene.canvasWidth, Scene.canvasHeight],
+			format: 'depth24plus',
+			usage: GPUTextureUsage.RENDER_ATTACHMENT,
+		});
 	}
 
 	public update(): void {
 		if (!this.device) {
 			throw new Error('Not exist device');
 		}
-		if (!this.context) {
+		if (!this.context || !this.depthTexture) {
 			throw new Error('Not exist context');
 		}
 

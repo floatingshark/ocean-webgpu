@@ -138,7 +138,14 @@ export class gpuShaderFFT extends gpuShader {
 			},
 		});
 
-		if (this.pipeline && this.uniformBufferMVP && this.uniformBufferFFT && this.storageBufferDz && this.storageBufferHt && this.storageBufferH0) {
+		if (
+			this.pipeline &&
+			this.uniformBufferMVP &&
+			this.uniformBufferFFT &&
+			this.storageBufferDz &&
+			this.storageBufferHt &&
+			this.storageBufferH0
+		) {
 			this.bindGroup = device.createBindGroup({
 				layout: this.pipeline.getBindGroupLayout(0),
 				entries: [
@@ -165,7 +172,7 @@ export class gpuShaderFFT extends gpuShader {
 						resource: {
 							buffer: this.storageBufferH0,
 						},
-					}
+					},
 				],
 			});
 		}

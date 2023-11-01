@@ -18,8 +18,8 @@ export class Canvas {
 			throw new Error('Not found canvas element.');
 		}
 
-		this.canvas.width = this.canvas.clientWidth;
-		this.canvas.height = this.canvas.clientHeight;
+		this.canvas.width = Scene.canvasWidth = this.canvas.clientWidth;
+		this.canvas.height = Scene.canvasHeight = this.canvas.clientHeight;
 		this.initializeEventListener();
 		this.webGPU = new WebGPU();
 	}
